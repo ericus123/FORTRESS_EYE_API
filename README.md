@@ -15,6 +15,8 @@
   - [Notifications](#notifications)
   - [Live Streaming and Playback](#live-streaming-and-playback)
   - [System Management and Monitoring](#system-management-and-monitoring)
+  - [Data Export and Report Generation](#data-export-and-report-generation)  <!-- New Item -->
+  - [Subscriptions for Notifications and Data Processing](#subscriptions-for-notifications-and-data-processing)  <!-- New Item -->
 - [Conclusion](#conclusion)
 
 ## Introduction
@@ -92,8 +94,23 @@ The FortressEye system consists of the following components:
 - The user-friendly dashboard built using NextJS provides an intuitive interface for users to manage the system, configure settings, and view system reports.
 - Users can turn the system on or off and access system logs and data for monitoring and generating reports.
 
+### Data Export and Report Generation
+
+- Users will be able to specify export criteria (e.g., date range, event type) and trigger data export.
+- When a user initiates an export, the system can generate the requested report (e.g., CSV, Excel, PDF) based on the specified criteria.
+- Store the generated report in the "Exported Data Table" and provide a link for the user to download it.
+- Implement a scheduler to periodically generate and update reports as needed (e.g., daily or weekly system status reports).
+
+### Subscriptions for Notifications and Data Processing
+
+- Users can subscribe to various notification channels and data processing services through the dashboard.
+- Implement NATS integration to facilitate real-time communication and event-driven data processing.
+- When an event, such as human detection or motion detection, occurs, the system can publish relevant data to NATS topics.
+- Users with active subscriptions can subscribe to specific NATS topics to receive real-time notifications or data updates.
+- Implement logic to manage subscription status in the "Subscriptions Table" (e.g., activate, deactivate, update preferences).
+- Users can customize their subscription preferences, such as specifying which events they want to be notified about and through which channels (email, SMS, NATS).
+
 ## Conclusion
 
 FortressEye is a sophisticated smart security system that combines CCTV cameras with Onvif protocol and Arduino Uno R4 WiFi. The name "FortressEye"
 
-represents a robust and vigilant system acting as a watchful eye to protect and safeguard users and their property. With its advanced surveillance capabilities, real-time notifications, and user-friendly dashboard, FortressEye offers a comprehensive and powerful solution for modern security needs.
