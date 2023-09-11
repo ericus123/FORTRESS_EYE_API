@@ -1,35 +1,14 @@
+import { ConfigService } from "@nestjs/config";
 import { SequelizeModuleOptions } from "@nestjs/sequelize";
 
-export const databaseConfigs: {
-  development: SequelizeModuleOptions;
-  staging: SequelizeModuleOptions;
-  production: SequelizeModuleOptions;
-} = {
-  development: {
-    dialect: "postgres",
-    host: "",
-    port: 0,
-    username: "",
-    password: "",
-    database: "",
-    synchronize: false,
-  },
-  staging: {
-    dialect: "postgres",
-    host: "",
-    port: 0,
-    username: "",
-    password: "",
-    database: "",
-    synchronize: false,
-  },
-  production: {
-    dialect: "postgres",
-    host: "",
-    port: 48932257,
-    username: "",
-    password: "",
-    database: "",
-    synchronize: false,
-  },
+export const databaseConfigs = {
+  development: (configService: ConfigService): SequelizeModuleOptions => ({
+    uri: configService.get<string>("DEV_DB_URI"),
+  }),
+  staging: (configService: ConfigService) => ({
+    uri: configService.get<string>("DEV_DB_URI"),
+  }),
+  production: (configService: ConfigService) => ({
+    uri: configService.get<string>("DEV_DB_URI"),
+  }),
 };
