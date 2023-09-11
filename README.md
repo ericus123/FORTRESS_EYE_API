@@ -1,7 +1,5 @@
 # FortressEye
 
-<br>
-
 **Table of Contents**
 
 - [Introduction](#introduction)
@@ -15,8 +13,16 @@
   - [Notifications](#notifications)
   - [Live Streaming and Playback](#live-streaming-and-playback)
   - [System Management and Monitoring](#system-management-and-monitoring)
-  - [Data Export and Report Generation](#data-export-and-report-generation)  <!-- New Item -->
-  - [Subscriptions for Notifications and Data Processing](#subscriptions-for-notifications-and-data-processing)  <!-- New Item -->
+  - [Data Export and Report Generation](#data-export-and-report-generation)
+  - [Subscriptions for Notifications and Data Processing](#subscriptions-for-notifications-and-data-processing)
+  - [Geofencing](#geofencing)
+  - [Voice Control](#voice-control)
+  - [Two-Factor Authentication (2FA)](#two-factor-authentication-2fa)
+  - [Temperature and Humidity Sensors](#temperature-and-humidity-sensors)
+  - [Smart Fan Control](#smart-fan-control)
+  - [Intruder Identification](#intruder-identification)
+  - [Emergency Panic Button](#emergency-panic-button)
+  - [User Activity Logs](#user-activity-logs)
 - [Conclusion](#conclusion)
 
 ## Introduction
@@ -33,6 +39,8 @@ FortressEye is a cutting-edge smart security system that combines CCTV cameras w
 - 5V power supply for Arduino and sensors
 - Internet connectivity (Wi-Fi module onboard Arduino Uno R4 WiFi)
 - Computer or Raspberry Pi for hosting the web server and dashboard
+- Temperature and humidity sensors (e.g., DHT22 or DHT11)
+- Fans for environmental control
 
 ## Software and Tech Stack
 
@@ -69,6 +77,7 @@ The FortressEye system consists of the following components:
 
 - When a person is detected, if the lights are not already on, the Arduino will switch on the lights automatically through the NestJS application.
 - If the lights are already on and a person is detected, specified buzzers will be activated for a specified duration.
+- When I'm around the compound/property, specified lights should turn (this can be fully customized through settings).
 
 ### Scheduling Functionality
 
@@ -105,12 +114,45 @@ The FortressEye system consists of the following components:
 
 - Users can subscribe to various notification channels and data processing services through the dashboard.
 - Implement NATS integration to facilitate real-time communication and event-driven data processing.
-- When an event, such as human detection or motion detection, occurs, the system can publish relevant data to NATS topics.
+- When an event, such as human detection or motion detection, occurs,
+
+ the system can publish relevant data to NATS topics.
 - Users with active subscriptions can subscribe to specific NATS topics to receive real-time notifications or data updates.
 - Implement logic to manage subscription status in the "Subscriptions Table" (e.g., activate, deactivate, update preferences).
 - Users can customize their subscription preferences, such as specifying which events they want to be notified about and through which channels (email, SMS, NATS).
 
+### Geofencing
+
+- Implement geofencing capabilities to automatically enable or disable the system based on the user's location. For example, the system could activate when the user leaves home and deactivate when they return.
+
+### Voice Control
+
+- Add voice assistant integration to allow users to control and receive status updates from the system using voice commands.
+
+### Two-Factor Authentication (2FA)
+
+- Enhance the security of the system by implementing 2FA for user logins, ensuring that only authorized individuals can access the dashboard and control the system.
+
+### Temperature and Humidity Sensors
+
+- Monitor temperature and humidity using sensors (e.g., DHT22 or DHT11) and trigger actions based on threshold values.
+
+### Smart Fan Control
+
+- Control fans based on temperature and humidity sensor data to maintain a comfortable environment.
+
+### Intruder Identification
+
+- Implement facial recognition or object recognition technology to identify known individuals or objects of interest, allowing the system to differentiate between authorized users and potential intruders.
+
+### Emergency Panic Button
+
+- Integrate a panic button feature in the mobile app or dashboard that, when pressed, triggers an immediate alert, such as notifying authorities or sending emergency notifications to predefined contacts.
+
+### User Activity Logs
+
+- Maintain detailed logs of user activity and system events for audit and security purposes, and allow users to review these logs in the dashboard.
+
 ## Conclusion
 
 FortressEye is a sophisticated smart security system that combines CCTV cameras with Onvif protocol and Arduino Uno R4 WiFi. The name "FortressEye"
-
