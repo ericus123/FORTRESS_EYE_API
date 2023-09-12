@@ -1,15 +1,18 @@
-// src/database/database.module.ts
-
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { JwtModule } from "@nestjs/jwt";
 import { SequelizeModule } from "@nestjs/sequelize";
+import { AuthService } from "../auth/auth.service";
 import { databaseConfigs } from "../config/database.config";
+import { CryptoModule } from "../crypto/crypto.module";
 import { User } from "../user/user.model";
 import { UserService } from "../user/user.service";
 
 @Module({
   imports: [
     ConfigModule,
+    CryptoModule,
+    JwtModule,
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService?: ConfigService) => ({
@@ -23,17 +26,17 @@ import { UserService } from "../user/user.service";
         models: [User],
 
         autoLoadModels: true,
-        synchronize: true,
+        // synchronize: true,
         sync: {
-          alter: true,
-          force: false,
+          // alter: true,
+          force: true,
         },
       }),
       inject: [ConfigService],
     }),
     SequelizeModule.forFeature([User]),
   ],
-  providers: [UserService],
+  providers: [UserService, AuthService],
   controllers: [],
 })
 export class DatabaseModule {}

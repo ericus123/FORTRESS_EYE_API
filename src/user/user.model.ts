@@ -1,15 +1,16 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { Field, ID, InputType, ObjectType } from "@nestjs/graphql";
+import { UUIDV4 } from "sequelize";
 import {
-  BelongsToMany,
   Column,
   DataType,
   Default,
+  Index,
   Model,
   PrimaryKey,
   Table,
   Unique,
 } from "sequelize-typescript";
-import { UserRole } from "../role/role.model";
+import { v4 as uuidv4 } from "uuid";
 
 export enum AccessRights {
   ADMIN = "ADMIN",
@@ -17,19 +18,24 @@ export enum AccessRights {
 }
 
 @ObjectType()
+@InputType("IUser")
 @Table({
   timestamps: true,
   tableName: "User",
+  omitNull: true,
+  paranoid: true,
 })
 export class User extends Model<User> {
   @Field((type) => ID)
+  @Index
   @PrimaryKey
-  @Default(DataType.INTEGER)
-  @Column({
-    type: DataType.INTEGER,
-    autoIncrement: true,
-  })
-  id: number;
+  @Default(UUIDV4)
+  @Column({ type: DataType.STRING })
+  id?: string = uuidv4();
+
+  @Field()
+  @Column({ type: DataType.STRING })
+  avatar: string;
 
   @Field()
   @Column({ type: DataType.STRING })
@@ -45,6 +51,11 @@ export class User extends Model<User> {
   username: string;
 
   @Field()
+  @Unique
+  @Column({ type: DataType.STRING })
+  bio: string;
+
+  @Field()
   @Column({ type: DataType.STRING })
   password: string;
 
@@ -57,13 +68,18 @@ export class User extends Model<User> {
   @Column({ type: DataType.STRING })
   phoneNumber: string;
 
-  @Field((type) => AccessRights)
-  @Column({
-    type: DataType.ENUM(...Object.values(AccessRights)),
-    allowNull: false,
-    defaultValue: AccessRights.USER,
-  })
-  accessRights: AccessRights;
+  // @Field((type) => AccessRights)
+  // @Column({
+  //   type: DataType.ENUM(...Object.values(AccessRights)),
+  //   allowNull: false,
+  //   defaultValue: AccessRights.USER,
+  // })
+  // accessRights: AccessRights;
+
+  @Field()
+  @Default(() => false)
+  @Column({ type: DataType.BOOLEAN })
+  deleted: boolean;
 
   @Field()
   @Column({ type: DataType.DATE })
@@ -72,8 +88,4 @@ export class User extends Model<User> {
   @Field()
   @Column({ type: DataType.DATE })
   updatedAt: Date;
-
-  @Field((type) => [UserRole], { nullable: true })
-  @BelongsToMany(() => UserRole, () => UserRole)
-  roles: UserRole[];
 }
