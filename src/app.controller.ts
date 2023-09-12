@@ -1,6 +1,6 @@
 import { Controller, Get, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { AppService } from "./app.service";
+import { IpfsService } from "./ipfs/ipfs.service";
 import { User } from "./user/user.model";
 import { UserService } from "./user/user.service";
 
@@ -10,13 +10,20 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly userService: UserService,
-    private readonly configService: ConfigService,
+    private readonly ipfsService: IpfsService,
   ) {}
 
   @Get()
   async getHello(): Promise<User[]> {
     const users = await this.userService.getUsers();
     this.logger.debug("Users", users);
+    this.ipfsService.addFile(
+      Buffer.from(
+        JSON.stringify({
+          data: "sample data",
+        }),
+      ),
+    );
     return users;
   }
 }
