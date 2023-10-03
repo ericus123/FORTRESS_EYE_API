@@ -2,24 +2,20 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { AuthModule } from "./auth/auth.module";
 import { CacheModule } from "./cache/cache.module";
 import { DatabaseModule } from "./database/database.module";
 import { validate } from "./env/environment.validation";
-import { GraphqlModule } from "./graphql/graphql.module";
 import { UserModule } from "./user/user.module";
 
 @Module({
   imports: [
+    DatabaseModule,
+    CacheModule,
+    UserModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
     }),
-    DatabaseModule,
-    CacheModule,
-    UserModule,
-    AuthModule,
-    GraphqlModule,
   ],
   controllers: [AppController],
   providers: [AppService],
