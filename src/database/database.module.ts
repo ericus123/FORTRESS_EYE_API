@@ -5,6 +5,7 @@ import { SequelizeModule } from "@nestjs/sequelize";
 import { AuthService } from "../auth/auth.service";
 import { databaseConfigs } from "../config/database.config";
 import { CryptoModule } from "../crypto/crypto.module";
+import { MqttService } from "../mqtt/mqtt.service";
 import { User } from "../user/user.model";
 import { UserService } from "../user/user.service";
 
@@ -36,7 +37,7 @@ import { UserService } from "../user/user.service";
     }),
     SequelizeModule.forFeature([User]),
   ],
-  providers: [UserService, AuthService],
+  providers: [UserService, AuthService, MqttService],
   controllers: [],
 })
 export class DatabaseModule {}
