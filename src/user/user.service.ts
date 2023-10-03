@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import HashingService from "../crypto/hashing.service";
+import { MqttService } from "../mqtt/mqtt.service";
 import { User } from "./user.model";
 import { GetUserInput, SignupInput } from "./user.types";
 @Injectable()
@@ -10,7 +11,13 @@ export class UserService {
     @InjectModel(User)
     private readonly userModel: typeof User,
     private readonly hashingService: HashingService,
-  ) {}
+    private readonly mqttService: MqttService,
+  ) {
+    this.mqttService.subscribe("home/lights/kitchen");
+    this.mqttService.onMessage((topic, message) => {
+      this.logger.debug(JSON.parse(message));
+    });
+  }
 
   async addUser(input: SignupInput): Promise<User> {
     try {
@@ -43,6 +50,7 @@ export class UserService {
   async getUsers(): Promise<User[]> {
     try {
       const users = await this.userModel.findAll();
+
       return users;
     } catch (error) {
       throw new Error(error);
