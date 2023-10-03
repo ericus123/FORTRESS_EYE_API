@@ -1,0 +1,69 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input GetUserInput {
+  type: String!
+  value: String!
+}
+
+input IUser {
+  avatar: String!
+  bio: String!
+  createdAt: DateTime!
+  deleted: Boolean! = false
+  email: String!
+  firstName: String!
+  id: ID! = "b8bebf4a-4f0b-4f44-8d2e-9dbc774ab5d1"
+  lastName: String!
+  password: String!
+  phoneNumber: String!
+  updatedAt: DateTime!
+  username: String!
+}
+
+type Mutation {
+  Signin(input: SigninInput!): SigninResponse!
+  SignupUser(user: SignupInput!): User!
+}
+
+type Query {
+  GetUser(input: GetUserInput!): User!
+  GetUsers: [User!]!
+}
+
+input SigninInput {
+  email: String!
+  password: String!
+}
+
+type SigninResponse {
+  accessToken: String!
+}
+
+input SignupInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+}
+
+type User {
+  avatar: String!
+  bio: String!
+  createdAt: DateTime!
+  deleted: Boolean!
+  email: String!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  password: String!
+  phoneNumber: String!
+  updatedAt: DateTime!
+  username: String!
+}
