@@ -1,18 +1,18 @@
-import { Args, Query, Resolver } from "@nestjs/graphql";
+import { Args, Query, Resolver } from "@nestjs/graphql"; // Import Args
 import { User } from "./user.model";
 import { UserService } from "./user.service";
-import { GetUserInput } from "./user.types";
 
-@Resolver("UsersResolver")
+@Resolver("User")
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Query(() => User, { name: "GetUser" })
-  async getUser(@Args("input") input: GetUserInput): Promise<User> {
-    return this.userService.getUser(input);
+  @Query((returns) => User, { name: "User" })
+  async getUser(@Args("id") id: string): Promise<User> {
+    // Define argument name
+    return this.userService.getUser(id);
   }
 
-  @Query(() => [User], { name: "GetUsers" })
+  @Query((returns) => [User], { name: "Users" })
   async getUsers(): Promise<User[]> {
     return this.userService.getUsers();
   }
