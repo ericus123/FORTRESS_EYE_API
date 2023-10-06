@@ -7,6 +7,7 @@ import { CacheModule } from "./cache/cache.module";
 import { DatabaseModule } from "./database/database.module";
 import { validate } from "./env/environment.validation";
 import { GraphqlModule } from "./graphql/graphql.module";
+import { MailModule } from "./mail/mail.module";
 import { UserModule } from "./user/user.module";
 
 @Module({
@@ -20,6 +21,7 @@ import { UserModule } from "./user/user.module";
     UserModule,
     AuthModule,
     GraphqlModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
