@@ -79,6 +79,11 @@ export class User extends Model<User> {
   @Field()
   @Default(() => false)
   @Column({ type: DataType.BOOLEAN })
+  verified: boolean;
+
+  @Field()
+  @Default(() => false)
+  @Column({ type: DataType.BOOLEAN })
   deleted: boolean;
 
   @Field()

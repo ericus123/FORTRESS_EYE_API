@@ -24,6 +24,11 @@ export class SigninResponse {
   accessToken: string;
 }
 
+@ObjectType()
+export class UserVerification {
+  @Field({ nullable: false })
+  verified: boolean;
+}
 @InputType()
 @ObjectType()
 export class SigninInput {

@@ -6,21 +6,21 @@ import * as bcrypt from "bcrypt";
 export class HashingService {
   constructor(private readonly configService: ConfigService) {}
 
-  async hash(password: string): Promise<string> {
+  async hash(value: any): Promise<any> {
     const salt = await bcrypt.genSalt();
 
-    const hash = await bcrypt.hash(password, salt);
+    const hash = await bcrypt.hash(value, salt);
 
     return hash;
   }
   async isMatch({
     hash,
-    password,
+    value,
   }: {
     hash: string;
-    password: string;
+    value: string;
   }): Promise<boolean> {
-    return await bcrypt.compare(password, hash);
+    return await bcrypt.compare(value, hash);
   }
 }
 

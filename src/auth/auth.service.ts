@@ -29,7 +29,7 @@ export class AuthService {
 
       const isMatch = await this.hashingService.isMatch({
         hash: user.password,
-        password,
+        value: password,
       });
       if (!isMatch) {
         throw new UnauthorizedException();
