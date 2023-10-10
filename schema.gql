@@ -19,7 +19,7 @@ input IUser {
   deleted: Boolean! = false
   email: String!
   firstName: String!
-  id: ID! = "ea0dfaad-46b8-4498-9258-12dd92c06d0d"
+  id: ID! = "e3962814-935b-40ee-8b28-a066d47d9505"
   lastName: String!
   password: String!
   phoneNumber: String!
