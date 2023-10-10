@@ -14,12 +14,7 @@ export class UserService {
     private readonly hashingService: HashingService,
     private readonly mqttService: MqttService,
     private readonly mailService: MailService,
-  ) {
-    this.mqttService.subscribe("home/lights/kitchen");
-    this.mqttService.onMessage((topic, message) => {
-      this.logger.debug(JSON.parse(message));
-    });
-  }
+  ) {}
 
   async addUser(input: SignupInput): Promise<User> {
     try {
@@ -52,6 +47,7 @@ export class UserService {
   async getUsers(): Promise<User[]> {
     try {
       const users = await this.userModel.findAll();
+      this.mqttService.publish("home/lights/kitchen", JSON.stringify(users));
       return users;
     } catch (error) {
       throw new Error(error);
