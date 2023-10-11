@@ -33,7 +33,7 @@ import { UserService } from "../user/user.service";
         // synchronize: true,
         sync: {
           // alter: true,
-          force: true,
+          force: false,
         },
       }),
       inject: [ConfigService],
