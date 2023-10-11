@@ -74,6 +74,23 @@ export class MailService {
     }
   }
 
+  getVerificationTemplate({
+    firstName,
+    token,
+  }: {
+    firstName: string;
+    token: string;
+  }): string {
+    try {
+      return `Hi ${firstName},
+          Thanks for creating account in FortressEye.
+          Use the link below to verify your account ${token}
+          `;
+    } catch (error) {
+      throw new Error("Something went wrong");
+    }
+  }
+
   private async getAccessToken(): Promise<string> {
     try {
       const { token } = await this.authClient.getAccessToken();

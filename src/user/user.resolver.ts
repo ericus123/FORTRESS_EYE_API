@@ -1,7 +1,7 @@
-import { Args, Query, Resolver } from "@nestjs/graphql";
+import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { User } from "./user.model";
 import { UserService } from "./user.service";
-import { GetUserInput } from "./user.types";
+import { GetUserInput, UserVerification } from "./user.types";
 
 @Resolver("UsersResolver")
 export class UserResolver {
@@ -15,5 +15,13 @@ export class UserResolver {
   @Query(() => [User], { name: "GetUsers" })
   async getUsers(): Promise<User[]> {
     return this.userService.getUsers();
+  }
+
+  @Mutation(() => UserVerification, { name: "VerifyUser" })
+  async verifyUser(
+    @Args("email") email: string,
+    @Args("token") token: string,
+  ): Promise<{ verified: boolean }> {
+    return this.userService.verifyUser({ email, token });
   }
 }

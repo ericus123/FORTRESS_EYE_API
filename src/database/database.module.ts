@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { AuthService } from "../auth/auth.service";
+import { CacheModule } from "../cache/cache.module";
 import { databaseConfigs } from "../config/database.config";
 import { CryptoModule } from "../crypto/crypto.module";
 import { MailService } from "../mail/mail.service";
@@ -15,6 +16,7 @@ import { UserService } from "../user/user.service";
     ConfigModule,
     CryptoModule,
     JwtModule,
+    CacheModule,
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService?: ConfigService) => ({
