@@ -19,7 +19,7 @@ input IUser {
   deleted: Boolean! = false
   email: String!
   firstName: String!
-  id: ID! = "e2950a10-273c-4c75-a96d-964c8de97004"
+  id: ID! = "cec8d0e0-c936-4732-8bae-2990896df50c"
   lastName: String!
   password: String!
   phoneNumber: String!
@@ -29,14 +29,16 @@ input IUser {
 }
 
 type Mutation {
+  ResetPassword(password: String!, token: String!): Boolean!
   Signin(input: SigninInput!): SigninResponse!
   SignupUser(user: SignupInput!): User!
-  VerifyUser(email: String!, token: String!): UserVerification!
+  VerifyUser(token: String!): UserVerification!
 }
 
 type Query {
   GetUser(input: GetUserInput!): User!
   GetUsers: [User!]!
+  RequestPasswordReset(email: String!, firstName: String!): Boolean!
 }
 
 input SigninInput {
