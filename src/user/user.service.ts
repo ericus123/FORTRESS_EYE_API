@@ -13,7 +13,7 @@ import HashingService from "../crypto/hashing.service";
 import { MailService } from "../mail/mail.service";
 import { MqttService } from "../mqtt/mqtt.service";
 import { User } from "./user.model";
-import { GetUserInput, SignupInput } from "./user.types";
+import { GetUserInput, SignupInput, TokenType } from "./user.types";
 
 class InvalidTokenException extends Error {
   constructor() {
@@ -30,6 +30,11 @@ class UnknownUserException extends NotFoundException {
 class UserAlreadyVerifiedException extends BadRequestException {
   constructor() {
     super("User already verified");
+  }
+}
+class UserNotVerifiedException extends BadRequestException {
+  constructor() {
+    super("User is not verified");
   }
 }
 
@@ -57,7 +62,7 @@ export class UserService {
       input.password = await this.hashingService.hash(input.password);
       const user = await this.userModel.create(input);
       const { firstName, email } = user;
-      await this.sendVeificationMail({ firstName, email });
+      await this.sendMail({ firstName, email, type: "Verification" });
       return user;
     } catch (error) {
       throw new Error(error);
@@ -108,20 +113,23 @@ export class UserService {
     }
   }
 
-  async sendVeificationMail({
+  async sendMail({
     firstName,
     email,
+    type,
   }: {
     firstName: string;
     email: string;
+    type: TokenType;
   }) {
     try {
       const token = jwt.sign(
         {
           email,
+          type,
         },
         this.configService.get<string>("JWT_SECRET"),
-        { expiresIn: "1m" },
+        { expiresIn: "5m" },
       );
 
       const template = this.mailService.getVerificationTemplate({
@@ -153,15 +161,18 @@ export class UserService {
   }
 
   async verifyUser({
-    email,
     token,
   }: {
-    email: string;
     token: string;
   }): Promise<{ verified: boolean }> {
     await this.verifyToken(token);
+    const _token: any = this.jwtService.decode(token);
 
-    const user = await this.getUser({ type: "EMAIL", value: email });
+    if (!_token?.email || !_token?.type || _token?.type != "Verification") {
+      throw new InvalidTokenException();
+    }
+
+    const user = await this.getUser({ type: "EMAIL", value: _token?.email });
 
     if (!user) {
       throw new UnknownUserException();
@@ -175,6 +186,63 @@ export class UserService {
       user.verified = true;
       await user.save();
       return { verified: user.verified };
+    } catch (error) {
+      throw new Error("Something went wrong");
+    }
+  }
+
+  async requestPasswordReset({
+    firstName,
+    email,
+  }: {
+    firstName: string;
+    email: string;
+  }) {
+    try {
+      this.sendMail({ firstName, email, type: "Reset" });
+      return true;
+    } catch (error) {
+      throw new Error("Something went wrong");
+    }
+  }
+
+  async resetPassword({
+    password,
+    token,
+  }: {
+    password: string;
+    token: string;
+  }) {
+    await this.verifyToken(token);
+    const _token: any = this.jwtService.decode(token);
+    const user = await this.getUser({ type: "EMAIL", value: _token?.email });
+    if (!_token?.email || !_token?.type || _token?.type != "Reset") {
+      throw new InvalidTokenException();
+    }
+
+    if (!user) {
+      throw new UnknownUserException();
+    }
+
+    if (!user.verified) {
+      throw new UserNotVerifiedException();
+    }
+
+    const passMatch = await this.hashingService.isMatch({
+      hash: user.password,
+      value: password,
+    });
+
+    if (passMatch) {
+      throw new BadRequestException(
+        "Old password and new password can't be the same",
+      );
+    }
+    try {
+      const newPass = await this.hashingService.hash(password);
+      user.password = newPass;
+      await user.save();
+      return true;
     } catch (error) {
       throw new Error("Something went wrong");
     }

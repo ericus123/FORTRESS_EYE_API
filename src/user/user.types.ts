@@ -71,3 +71,5 @@ export class SignupInput {
   @Column({ type: DataType.STRING })
   password: string;
 }
+
+export type TokenType = "Auth" | "Verification" | "Reset";

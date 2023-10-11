@@ -12,7 +12,7 @@ import { UserResolver } from "../user/user.resolver";
     AuthModule,
     GraphQLModule.forRoot<MercuriusDriverConfig>({
       driver: MercuriusDriver,
-      autoSchemaFile: "schema.gql",
+      autoSchemaFile: "src/graphql/schema.gql",
       ide: false,
       graphiql: true,
       routes: true,

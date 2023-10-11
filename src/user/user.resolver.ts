@@ -19,9 +19,24 @@ export class UserResolver {
 
   @Mutation(() => UserVerification, { name: "VerifyUser" })
   async verifyUser(
-    @Args("email") email: string,
     @Args("token") token: string,
   ): Promise<{ verified: boolean }> {
-    return this.userService.verifyUser({ email, token });
+    return this.userService.verifyUser({ token });
+  }
+
+  @Query(() => Boolean, { name: "RequestPasswordReset" })
+  async requestPasswordReset(
+    @Args("firstName") firstName: string,
+    @Args("email") email: string,
+  ): Promise<boolean> {
+    return this.userService.requestPasswordReset({ firstName, email });
+  }
+
+  @Mutation(() => Boolean, { name: "ResetPassword" })
+  async resetPassword(
+    @Args("password") password: string,
+    @Args("token") token: string,
+  ): Promise<boolean> {
+    return this.userService.resetPassword({ password, token });
   }
 }
