@@ -1,23 +1,48 @@
 import { UsePipes } from "@nestjs/common";
-import { Args, Mutation, Resolver } from "@nestjs/graphql";
-import { User } from "../user/user.model";
-import { SigninInput, SigninResponse, SignupInput } from "../user/user.types";
+import { Args, Context, Mutation, Resolver } from "@nestjs/graphql";
+import { FastifyReply, FastifyRequest } from "fastify";
+import { AuthResponse, SigninInput, SignupInput } from "../user/user.types";
 import { ValidationPipe } from "../validations/validation.pipe";
 import { AuthService } from "./auth.service";
+
+export type FastifyContext = {
+  reply: FastifyReply;
+  request: FastifyRequest;
+};
 
 @Resolver("AuthResolver")
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => SigninResponse, { name: "Signin" })
+  @Mutation(() => AuthResponse, { name: "Signin" })
   @UsePipes(new ValidationPipe())
-  async signin(@Args("input") input: SigninInput): Promise<SigninResponse> {
-    return this.authService.signin(input);
+  async signin(
+    @Args("input") input: SigninInput,
+    @Context() context: FastifyContext,
+  ): Promise<AuthResponse> {
+    const { accessToken, refreshToken } = await this.authService.signin(input);
+
+    // const reply: FastifyReply = context.reply;
+
+    // reply.header("Authorization", `Bearer ${accessToken}`);
+    // reply.header("X-Refresh-Token", refreshToken);
+
+    return { accessToken, refreshToken };
   }
 
-  @Mutation(() => User, { name: "SignupUser" })
+  @Mutation(() => AuthResponse, { name: "SignupUser" })
   @UsePipes(new ValidationPipe())
-  async signup(@Args("user") input: SignupInput): Promise<User> {
-    return this.authService.signup(input);
+  async signup(
+    @Args("user") input: SignupInput,
+    @Context()
+    context: FastifyContext,
+  ): Promise<AuthResponse> {
+    const { accessToken, refreshToken } = await this.authService.signup(input);
+
+    // const reply: FastifyReply = context.reply;
+    // reply.header("Authorization", `Bearer ${accessToken}`);
+    // reply.header("X-Refresh-Token", refreshToken);
+
+    return { accessToken, refreshToken };
   }
 }

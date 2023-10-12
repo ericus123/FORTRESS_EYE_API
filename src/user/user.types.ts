@@ -19,12 +19,6 @@ export class GetUserInput {
 }
 
 @ObjectType()
-export class SigninResponse {
-  @Field({ nullable: false })
-  accessToken: string;
-}
-
-@ObjectType()
 export class UserVerification {
   @Field({ nullable: false })
   verified: boolean;
@@ -45,6 +39,13 @@ export class SigninInput {
   password: string;
 }
 
+@ObjectType()
+export class AuthResponse {
+  @Field({ nullable: false })
+  accessToken: string;
+  @Field({ nullable: false })
+  refreshToken: string;
+}
 @InputType()
 @ObjectType()
 export class SignupInput {
@@ -72,4 +73,9 @@ export class SignupInput {
   password: string;
 }
 
-export type TokenType = "Auth" | "Verification" | "Reset";
+export enum TokenType {
+  "Access" = "Access",
+  "Refresh" = "Refresh",
+  "Verification" = "Verification",
+  "Reset" = "Reset",
+}

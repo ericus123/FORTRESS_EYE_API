@@ -1,10 +1,15 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import {
+  Injectable,
+  ServiceUnavailableException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import HashingService from "../crypto/hashing.service";
+import { JwtService } from "../jwt/jwt.service";
 import { User } from "../user/user.model";
 import { UserService } from "../user/user.service";
-import { SigninInput, SigninResponse, SignupInput } from "../user/user.types";
+import { AuthResponse, SigninInput, SignupInput } from "../user/user.types";
+import { AuthErrors } from "./constants";
 
 export type TokenData = {
   sub: string;
@@ -21,7 +26,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signin({ email, password }: SigninInput): Promise<SigninResponse> {
+  async signin({ email, password }: SigninInput): Promise<AuthResponse> {
     try {
       const user = await this.userModel.findOne({
         where: {
@@ -29,7 +34,7 @@ export class AuthService {
         },
       });
       if (!user) {
-        throw new Error("Unknown user");
+        throw new UnauthorizedException(AuthErrors.UNKNOWN_USER);
       }
 
       const isMatch = await this.hashingService.isMatch({
@@ -37,7 +42,7 @@ export class AuthService {
         value: password,
       });
       if (!isMatch) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException(AuthErrors.PASS_DOESNT_MATCH);
       }
 
       const payload: TokenData = {
@@ -46,30 +51,34 @@ export class AuthService {
         isVerified: user.isVerified,
       };
 
-      return {
-        accessToken: await this.jwtService.signAsync(payload),
-      };
+      const { accessToken, refreshToken } =
+        await this.jwtService.generateAuthTokens(payload);
+      return { accessToken, refreshToken };
     } catch (error) {
-      throw new Error(error);
+      throw new ServiceUnavailableException(AuthErrors.SERVER_ERROR);
     }
   }
 
-  async signup(input: SignupInput): Promise<User> {
+  async signup(input: SignupInput): Promise<AuthResponse> {
+    const exist = await this.userService.getUser({
+      type: "EMAIL",
+      value: input?.email,
+    });
+
+    if (exist) {
+      throw new UnauthorizedException(AuthErrors.ALREADY_REGISTERED);
+    }
+
+    const res = await this.userService.addUser(input);
     try {
-      const exist = await this.userService.getUser({
-        type: "EMAIL",
-        value: input?.email,
-      });
-
-      if (exist) {
-        throw new Error("User already registered, please signin");
-      }
-
-      const res = await this.userService.addUser(input);
-
-      return res;
+      const { accessToken, refreshToken } =
+        await this.jwtService.generateAuthTokens({
+          email: res.email,
+          sub: res.id,
+        });
+      return { accessToken, refreshToken };
     } catch (error) {
-      throw new Error(error);
+      throw new ServiceUnavailableException(AuthErrors.SERVER_ERROR);
     }
   }
 

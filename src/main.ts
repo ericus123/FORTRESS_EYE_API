@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
@@ -30,6 +32,7 @@ async function bootstrap() {
   });
   await app.startAllMicroservices();
   await app.listen(process.env.PORT, "0.0.0.0");
-  logger.debug(`Server is running on port ${await app.getUrl()}`);
+  logger.debug(`Server is running at ${await app.getUrl()}`);
 }
+
 bootstrap();

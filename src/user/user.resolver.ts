@@ -4,7 +4,7 @@ import { AuthGuard } from "../auth/auth.guard";
 import { User } from "./user.model";
 import { UserService } from "./user.service";
 import { GetUserInput, UserVerification } from "./user.types";
-
+@UseGuards(AuthGuard)
 @Resolver("UsersResolver")
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
@@ -26,7 +26,7 @@ export class UserResolver {
   ): Promise<{ verified: boolean }> {
     return this.userService.verifyUser({ token });
   }
-
+  @UseGuards(AuthGuard)
   @Query(() => Boolean, { name: "RequestPasswordReset" })
   async requestPasswordReset(
     @Args("firstName") firstName: string,
