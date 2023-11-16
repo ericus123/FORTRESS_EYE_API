@@ -33,7 +33,7 @@ export class User extends Model<User> {
   @Column({ type: DataType.STRING })
   id?: string = uuidv4();
 
-  @Field()
+  @Field({ nullable: true })
   @Column({ type: DataType.STRING })
   avatar: string;
 
@@ -45,12 +45,12 @@ export class User extends Model<User> {
   @Column({ type: DataType.STRING })
   lastName: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Unique
   @Column({ type: DataType.STRING })
   username: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Unique
   @Column({ type: DataType.STRING })
   bio: string;
@@ -64,7 +64,7 @@ export class User extends Model<User> {
   @Column({ type: DataType.STRING })
   email: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({ type: DataType.STRING })
   phoneNumber: string;
 
