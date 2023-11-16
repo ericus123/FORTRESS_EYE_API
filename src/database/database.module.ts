@@ -2,6 +2,8 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { SequelizeModule } from "@nestjs/sequelize";
+import { Area } from "../area/area.model";
+import { AreaModule } from "../area/area.module";
 import { AuthService } from "../auth/auth.service";
 import { CacheModule } from "../cache/cache.module";
 import { databaseConfigs } from "../config/database.config";
@@ -17,6 +19,7 @@ import { UserService } from "../user/user.service";
     CryptoModule,
     JwtModule,
     CacheModule,
+    AreaModule,
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService?: ConfigService) => ({
@@ -27,13 +30,13 @@ import { UserService } from "../user/user.service";
             : configService.get<string>("NODE_ENV") === "staging"
             ? databaseConfigs.staging(configService).uri
             : databaseConfigs.production(configService).uri,
-        models: [User],
+        models: [User, Area],
 
         autoLoadModels: true,
         // synchronize: true,
         sync: {
           // alter: true,
-          force: true,
+          force: false,
         },
       }),
       inject: [ConfigService],
