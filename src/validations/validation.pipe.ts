@@ -20,6 +20,7 @@ export class ValidationPipe implements PipeTransform<any> {
     const errors = await validate(object);
 
     if (errors.length > 0) {
+      console.log(errors);
       throw new BadRequestException("Invalid input");
     }
 

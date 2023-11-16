@@ -1,22 +1,21 @@
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from "@nestjs/platform-fastify";
+import { altairExpress } from "altair-express-middleware";
 import { AppModule } from "./app.module";
 
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { NestExpressApplication } from "@nestjs/platform-express";
 import * as dotenv from "dotenv";
 dotenv.config();
 
 async function bootstrap() {
   const logger = new Logger("Bootstrap Service");
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const expressApp = app.getHttpAdapter().getInstance();
+
+  expressApp.use("/altair", altairExpress({ endpointURL: "/graphql" }));
+
   logger.log("Starting all microservices");
   const config = app.get(ConfigService);
   app.connectMicroservice<MicroserviceOptions>({
