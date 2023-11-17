@@ -26,5 +26,6 @@ import { MqttService } from "./mqtt.service";
   ],
   controllers: [MqttController],
   providers: [MqttService],
+  exports: [MqttService],
 })
 export class MqttModule {}

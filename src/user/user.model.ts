@@ -82,15 +82,14 @@ export class User extends Model<User> {
   verified: boolean;
 
   @Field()
-  @Default(() => false)
-  @Column({ type: DataType.BOOLEAN })
-  deleted: boolean;
-
-  @Field()
   @Column({ type: DataType.DATE })
   createdAt: Date;
 
   @Field()
   @Column({ type: DataType.DATE })
   updatedAt: Date;
+
+  @Field({ nullable: true })
+  @Column({ type: DataType.DATE })
+  deletedAt?: Date;
 }
