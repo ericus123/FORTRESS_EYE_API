@@ -79,7 +79,7 @@ export class User extends Model<User> {
   @Field()
   @Default(() => false)
   @Column({ type: DataType.BOOLEAN })
-  verified: boolean;
+  isVerified: boolean;
 
   @Field()
   @Column({ type: DataType.DATE })

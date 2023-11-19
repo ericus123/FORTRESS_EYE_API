@@ -50,12 +50,7 @@ export class UserService {
     private jwtService: JwtService,
     private readonly cacheService: CacheService,
     private readonly configService: ConfigService,
-  ) {
-    this.mqttService.subscribe("home/lights/kitchen");
-    this.mqttService.onMessage((topic, message) => {
-      this.logger.debug(JSON.parse(message));
-    });
-  }
+  ) {}
 
   async addUser(input: SignupInput): Promise<User> {
     try {
@@ -92,7 +87,6 @@ export class UserService {
   async getUsers(): Promise<User[]> {
     try {
       const users = await this.userModel.findAll();
-      this.mqttService.publish("home/lights/kitchen", JSON.stringify(users));
       return users;
     } catch (error) {
       throw new Error(error);
@@ -178,14 +172,14 @@ export class UserService {
       throw new UnknownUserException();
     }
 
-    if (user.verified) {
+    if (user.isVerified) {
       throw new UserAlreadyVerifiedException();
     }
 
     try {
-      user.verified = true;
+      user.isVerified = true;
       await user.save();
-      return { verified: user.verified };
+      return { verified: user.isVerified };
     } catch (error) {
       throw new Error("Something went wrong");
     }
@@ -224,7 +218,7 @@ export class UserService {
       throw new UnknownUserException();
     }
 
-    if (!user.verified) {
+    if (!user.isVerified) {
       throw new UserNotVerifiedException();
     }
 

@@ -17,7 +17,7 @@ import { jwtConstants } from "./constants";
       useFactory: async () => ({
         global: true,
         secret: jwtConstants().secret,
-        signOptions: { expiresIn: "60s" },
+        signOptions: { expiresIn: "5m" },
       }),
     }),
     UserModule,
