@@ -12,4 +12,7 @@ export class CacheService {
   async get(key: string): Promise<any> {
     return this.cacheManager.get(key);
   }
+  async delete(key: string): Promise<any> {
+    return this.cacheManager.get(key);
+  }
 }

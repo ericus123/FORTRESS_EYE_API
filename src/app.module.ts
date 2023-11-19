@@ -8,6 +8,7 @@ import { CacheModule } from "./cache/cache.module";
 import { DatabaseModule } from "./database/database.module";
 import { validate } from "./env/environment.validation";
 import { GraphqlModule } from "./graphql/graphql.module";
+import { JwtModule } from "./jwt/jwt.module";
 import { MailModule } from "./mail/mail.module";
 import { MqttModule } from "./mqtt/mqtt.module";
 import { UserModule } from "./user/user.module";
@@ -26,6 +27,7 @@ import { UserModule } from "./user/user.module";
     GraphqlModule,
     MailModule,
     MqttModule,
+    JwtModule,
   ],
   controllers: [AppController],
   providers: [AppService],

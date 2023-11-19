@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { JwtModule } from "@nestjs/jwt";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { Area } from "../area/area.model";
 import { AreaModule } from "../area/area.module";
@@ -8,6 +7,7 @@ import { AuthService } from "../auth/auth.service";
 import { CacheModule } from "../cache/cache.module";
 import { databaseConfigs } from "../config/database.config";
 import { CryptoModule } from "../crypto/crypto.module";
+import { JwtModule } from "../jwt/jwt.module";
 import { MailService } from "../mail/mail.service";
 import { MqttService } from "../mqtt/mqtt.service";
 import { User } from "../user/user.model";
@@ -17,7 +17,6 @@ import { UserService } from "../user/user.service";
   imports: [
     ConfigModule,
     CryptoModule,
-    JwtModule,
     CacheModule,
     AreaModule,
     SequelizeModule.forRootAsync({
@@ -42,6 +41,7 @@ import { UserService } from "../user/user.service";
       inject: [ConfigService],
     }),
     SequelizeModule.forFeature([User]),
+    JwtModule,
   ],
   providers: [UserService, AuthService, MqttService, MailService],
   controllers: [],

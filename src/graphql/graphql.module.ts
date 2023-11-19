@@ -1,11 +1,11 @@
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { Module } from "@nestjs/common";
 import { GraphQLModule } from "@nestjs/graphql";
-import { JwtModule } from "@nestjs/jwt";
 import { AreaModule } from "../area/area.module";
 import { AreaResolver } from "../area/area.resolver";
 import { AuthModule } from "../auth/auth.module";
 import { AuthResolver } from "../auth/auth.resolver";
+import { JwtModule } from "../jwt/jwt.module";
 import { UserModule } from "../user/user.module";
 import { UserResolver } from "../user/user.resolver";
 
