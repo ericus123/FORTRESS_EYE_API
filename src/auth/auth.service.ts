@@ -6,6 +6,11 @@ import { User } from "../user/user.model";
 import { UserService } from "../user/user.service";
 import { SigninInput, SigninResponse, SignupInput } from "../user/user.types";
 
+export type TokenData = {
+  sub: string;
+  email: string;
+  isVerified: boolean;
+};
 @Injectable()
 export class AuthService {
   constructor(
@@ -35,7 +40,11 @@ export class AuthService {
         throw new UnauthorizedException();
       }
 
-      const payload = { sub: user.id, email: user.email };
+      const payload: TokenData = {
+        sub: user.id,
+        email: user.email,
+        isVerified: user.isVerified,
+      };
 
       return {
         accessToken: await this.jwtService.signAsync(payload),

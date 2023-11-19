@@ -14,7 +14,6 @@ export class AreaService {
     try {
       return await this.areaModel.create(input);
     } catch (error) {
-      console.error(error);
       throw new Error(error);
     }
   }
