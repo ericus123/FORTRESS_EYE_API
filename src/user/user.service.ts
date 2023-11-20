@@ -11,6 +11,9 @@ import HashingService from "../crypto/hashing.service";
 import { InvalidTokenException, JwtService } from "../jwt/jwt.service";
 import { MailService } from "../mail/mail.service";
 import { MqttService } from "../mqtt/mqtt.service";
+import { Permission } from "../permission/permission.model";
+import { Role, RoleName } from "../role/role.model";
+import { RoleService } from "../role/role.service";
 import { User } from "./user.model";
 import { GetUserInput, SignupInput, TokenType } from "./user.types";
 
@@ -39,6 +42,7 @@ export class UserService {
     private readonly userModel: typeof User,
     private readonly hashingService: HashingService,
     private readonly mqttService: MqttService,
+    private readonly roleService: RoleService,
     private readonly mailService: MailService,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -48,6 +52,13 @@ export class UserService {
     try {
       input.password = await this.hashingService.hash(input.password);
       const user = await this.userModel.create(input);
+      const defaultRole = await this.roleService.getRole({
+        type: "roleName",
+        value: RoleName.DEFAULT,
+      });
+
+      user.roleId = defaultRole.id;
+      await user.save();
       const { firstName, email } = user;
       await this.sendMail({ firstName, email, type: TokenType.Verification });
       return user;
@@ -63,13 +74,32 @@ export class UserService {
           where: {
             email: value,
           },
+          include: [
+            {
+              model: Role,
+              attributes: ["roleName", "description"],
+            },
+          ],
         });
 
         return user;
       }
 
       if (type === "ID") {
-        const user = await this.userModel.findByPk(value);
+        const user = await this.userModel.findByPk(value, {
+          include: [
+            {
+              model: Role,
+              attributes: ["roleName", "description"],
+              include: [
+                {
+                  model: Permission,
+                  attributes: ["permissionName", "description"],
+                },
+              ],
+            },
+          ],
+        });
         return user;
       }
     } catch (error) {
@@ -78,7 +108,20 @@ export class UserService {
   }
   async getUsers(): Promise<User[]> {
     try {
-      const users = await this.userModel.findAll();
+      const users = await this.userModel.findAll({
+        include: [
+          {
+            model: Role,
+            attributes: ["roleName", "description"],
+            include: [
+              {
+                model: Permission,
+                attributes: ["permissionName", "description"],
+              },
+            ],
+          },
+        ],
+      });
       return users;
     } catch (error) {
       throw new Error(error);
@@ -216,6 +259,23 @@ export class UserService {
       return true;
     } catch (error) {
       throw new Error("Something went wrong");
+    }
+  }
+
+  async assignRole({ email, roleName }: { email: string; roleName: RoleName }) {
+    try {
+      const user = await this.getUser({ type: "EMAIL", value: email });
+      const role = await this.roleService.getRole({
+        type: "roleName",
+        value: roleName,
+      });
+      user.roleId = role.id;
+      await user.save();
+
+      this.logger.debug("new role assigned to ", email);
+    } catch (error) {
+      this.logger.error(error);
+      throw new Error(error);
     }
   }
 }

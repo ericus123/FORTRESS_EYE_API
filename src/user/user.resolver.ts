@@ -1,20 +1,23 @@
 import { UseGuards } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Roles } from "../auth/auth.decorators";
 import { AuthGuard } from "../auth/auth.guard";
+import { RoleName } from "../role/role.model";
 import { User } from "./user.model";
 import { UserService } from "./user.service";
 import { GetUserInput, UserVerification } from "./user.types";
-@UseGuards(AuthGuard)
 @Resolver("UsersResolver")
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(AuthGuard)
+  @Roles(RoleName.SUPER_ADMIN, RoleName.ADMIN)
   @Query(() => User, { name: "GetUser" })
   async getUser(@Args("input") input: GetUserInput): Promise<User> {
     return this.userService.getUser(input);
   }
-
   @UseGuards(AuthGuard)
+  @Roles(RoleName.SUPER_ADMIN, RoleName.ADMIN)
   @Query(() => [User], { name: "GetUsers" })
   async getUsers(): Promise<User[]> {
     return this.userService.getUsers();
@@ -26,7 +29,6 @@ export class UserResolver {
   ): Promise<{ verified: boolean }> {
     return this.userService.verifyUser({ token });
   }
-  @UseGuards(AuthGuard)
   @Query(() => Boolean, { name: "RequestPasswordReset" })
   async requestPasswordReset(
     @Args("firstName") firstName: string,

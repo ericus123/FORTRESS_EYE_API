@@ -21,12 +21,6 @@ export class AuthResolver {
     @Context() context: FastifyContext,
   ): Promise<AuthResponse> {
     const { accessToken, refreshToken } = await this.authService.signin(input);
-
-    // const reply: FastifyReply = context.reply;
-
-    // reply.header("Authorization", `Bearer ${accessToken}`);
-    // reply.header("X-Refresh-Token", refreshToken);
-
     return { accessToken, refreshToken };
   }
 
@@ -38,11 +32,6 @@ export class AuthResolver {
     context: FastifyContext,
   ): Promise<AuthResponse> {
     const { accessToken, refreshToken } = await this.authService.signup(input);
-
-    // const reply: FastifyReply = context.reply;
-    // reply.header("Authorization", `Bearer ${accessToken}`);
-    // reply.header("X-Refresh-Token", refreshToken);
-
     return { accessToken, refreshToken };
   }
 }
