@@ -4,13 +4,16 @@ import {
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
 import { GqlExecutionContext } from "@nestjs/graphql";
 import { JwtService } from "../jwt/jwt.service";
+import { RoleName } from "../role/role.model";
+import { ROLES_KEY } from "./auth.decorators";
 import { AuthErrors } from "./constants";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(private jwtService: JwtService, private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
@@ -23,10 +26,12 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException(AuthErrors.INVALID_HEADERS);
     }
 
-    const isValidRefreshToken = await this.jwtService.verifyToken(refreshToken);
+    const isValidRefreshToken: any = await this.jwtService.verifyToken(
+      refreshToken,
+    );
     const payload: any = await this.jwtService.verifyToken(accessToken);
 
-    if (!isValidRefreshToken) {
+    if (!isValidRefreshToken || !payload) {
       throw new UnauthorizedException(AuthErrors.INVALID_TOKEN);
     }
 
@@ -34,7 +39,11 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException(AuthErrors.INVALID_HEADERS);
     }
 
-    if (!payload || payload?.data?.isVerified !== true) {
+    if (payload?.data?.sub !== isValidRefreshToken?.data?.userId) {
+      throw new UnauthorizedException(AuthErrors.INVALID_TOKEN);
+    }
+
+    if (payload?.data?.isVerified !== true) {
       throw new UnauthorizedException(AuthErrors.UNVERIFIED_ACCOUNT);
     }
 
@@ -49,14 +58,34 @@ export class AuthGuard implements CanActivate {
       res.setHeader("Authorization", `Bearer ${token}`);
     }
 
+    const userRole = payload?.data?.role;
+
+    if (!userRole) {
+      throw new UnauthorizedException(AuthErrors.INVALID_ROLES_OR_PERMISSIONS);
+    }
+    const requiredRoles = this.reflector.get<RoleName[]>(
+      ROLES_KEY,
+      context.getHandler(),
+    );
+    if (
+      requiredRoles &&
+      requiredRoles.length > 0 &&
+      !this.matchRoles(userRole, requiredRoles)
+    ) {
+      throw new UnauthorizedException(AuthErrors.INSUFFICIENT_ROLE);
+    }
     return true;
   }
 
   private extractTokenFromHeader(headers: any): string | undefined {
-    const token = headers["authorization"].split(" ");
-    if (token.length === 2 && token[0].toLowerCase() === "bearer") {
+    const token = headers["authorization"]?.split(" ");
+    if (token?.length === 2 && token[0]?.toLowerCase() === "bearer") {
       return token[1];
     }
     return undefined;
+  }
+
+  private matchRoles(userRole: RoleName, requiredRoles: RoleName[]): boolean {
+    return requiredRoles.includes(userRole);
   }
 }

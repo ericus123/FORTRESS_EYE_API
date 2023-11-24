@@ -7,6 +7,7 @@ import { CryptoModule } from "../crypto/crypto.module";
 import { JwtModule } from "../jwt/jwt.module";
 import { MailModule } from "../mail/mail.module";
 import { MqttModule } from "../mqtt/mqtt.module";
+import { RoleModule } from "../role/role.module";
 import { User } from "./user.model";
 import { UserService } from "./user.service";
 
@@ -18,6 +19,7 @@ import { UserService } from "./user.service";
     MailModule,
     CacheModule,
     JwtModule,
+    RoleModule,
     SequelizeModule.forFeature([User]),
   ],
   providers: [UserService, JwtService],

@@ -1,4 +1,5 @@
 import { Field, ID, InputType, ObjectType } from "@nestjs/graphql";
+import { IsNotEmpty, Length } from "class-validator";
 import { UUIDV4 } from "sequelize";
 import {
   Column,
@@ -28,6 +29,8 @@ export class Area extends Model<Area> {
   id?: string = uuidv4();
 
   @Field(() => String)
+  @IsNotEmpty({ message: "Area name is required" })
+  @Length(1, 30, { message: "Area name must be between 1 and 30 characters" })
   @Column({ type: DataType.STRING })
   name: string;
 

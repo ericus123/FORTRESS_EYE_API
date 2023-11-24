@@ -1,11 +1,8 @@
-import {
-  Injectable,
-  ServiceUnavailableException,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import HashingService from "../crypto/hashing.service";
 import { JwtService } from "../jwt/jwt.service";
+import { RoleName } from "../role/role.model";
 import { User } from "../user/user.model";
 import { UserService } from "../user/user.service";
 import { AuthResponse, SigninInput, SignupInput } from "../user/user.types";
@@ -15,6 +12,8 @@ export type TokenData = {
   sub: string;
   email: string;
   isVerified: boolean;
+  role?: RoleName;
+  permissions?: PermissionName[];
 };
 @Injectable()
 export class AuthService {
@@ -28,11 +27,17 @@ export class AuthService {
 
   async signin({ email, password }: SigninInput): Promise<AuthResponse> {
     try {
-      const user = await this.userModel.findOne({
-        where: {
-          email,
-        },
+      // const user = await this.userModel.findOne({
+      //   where: {
+      //     email,
+      //   },
+      // });
+
+      const user = await this.userService.getUser({
+        type: "EMAIL",
+        value: email,
       });
+
       if (!user) {
         throw new UnauthorizedException(AuthErrors.UNKNOWN_USER);
       }
@@ -49,13 +54,14 @@ export class AuthService {
         sub: user.id,
         email: user.email,
         isVerified: user.isVerified,
+        role: user.role.roleName,
       };
 
       const { accessToken, refreshToken } =
         await this.jwtService.generateAuthTokens(payload);
       return { accessToken, refreshToken };
     } catch (error) {
-      throw new ServiceUnavailableException(AuthErrors.SERVER_ERROR);
+      throw new Error(error);
     }
   }
 
@@ -70,15 +76,22 @@ export class AuthService {
     }
 
     const res = await this.userService.addUser(input);
+    const user = await this.userService.getUser({
+      type: "EMAIL",
+      value: res.email,
+    });
     try {
+      const { email, isVerified, role, id } = user;
       const { accessToken, refreshToken } =
         await this.jwtService.generateAuthTokens({
-          email: res.email,
-          sub: res.id,
+          email,
+          sub: id,
+          role: role.roleName,
+          isVerified,
         });
       return { accessToken, refreshToken };
     } catch (error) {
-      throw new ServiceUnavailableException(AuthErrors.SERVER_ERROR);
+      throw new Error(error);
     }
   }
 

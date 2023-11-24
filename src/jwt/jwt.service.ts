@@ -35,10 +35,7 @@ export class JwtService {
     }
   }
 
-  async generateAuthTokens(payload: {
-    email: string;
-    sub: string;
-  }): Promise<AuthResponse> {
+  async generateAuthTokens(payload: TokenData): Promise<AuthResponse> {
     try {
       const accessToken = await this.generateToken(
         {

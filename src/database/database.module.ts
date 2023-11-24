@@ -10,6 +10,10 @@ import { CryptoModule } from "../crypto/crypto.module";
 import { JwtModule } from "../jwt/jwt.module";
 import { MailService } from "../mail/mail.service";
 import { MqttService } from "../mqtt/mqtt.service";
+import { Permission, PermissionRole } from "../permission/permission.model";
+import { PermissionModule } from "../permission/permission.module";
+import { Role } from "../role/role.model";
+import { RoleModule } from "../role/role.module";
 import { User } from "../user/user.model";
 import { UserService } from "../user/user.service";
 
@@ -19,6 +23,8 @@ import { UserService } from "../user/user.service";
     CryptoModule,
     CacheModule,
     AreaModule,
+    RoleModule,
+    PermissionModule,
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService?: ConfigService) => ({
@@ -29,7 +35,7 @@ import { UserService } from "../user/user.service";
             : configService.get<string>("NODE_ENV") === "staging"
             ? databaseConfigs.staging(configService).uri
             : databaseConfigs.production(configService).uri,
-        models: [User, Area],
+        models: [User, Area, Role, Permission, PermissionRole],
 
         autoLoadModels: true,
         // synchronize: true,
@@ -40,7 +46,7 @@ import { UserService } from "../user/user.service";
       }),
       inject: [ConfigService],
     }),
-    SequelizeModule.forFeature([User]),
+    SequelizeModule.forFeature([User, Role, Permission, Area, PermissionRole]),
     JwtModule,
   ],
   providers: [UserService, AuthService, MqttService, MailService],
