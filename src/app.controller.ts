@@ -1,7 +1,6 @@
 import { Controller, Get, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AppService } from "./app.service";
-import { User } from "./user/user.model";
 import { UserService } from "./user/user.service";
 
 @Controller()
@@ -14,9 +13,7 @@ export class AppController {
   ) {}
 
   @Get()
-  async getHello(): Promise<User[]> {
-    const users = await this.userService.getUsers();
-    this.logger.debug("Users", users);
-    return users;
+  async getHello() {
+    this.logger.debug("Fortress eye");
   }
 }

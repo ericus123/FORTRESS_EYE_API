@@ -1,3 +1,5 @@
+[![CI/CD](https://github.com/ericus123/FORTRESS_EYE/actions/workflows/main.yml/badge.svg)](https://github.com/ericus123/FORTRESS_EYE/actions/workflows/main.yml)
+
 # FortressEye
 
 **Table of Contents**
@@ -116,7 +118,8 @@ The FortressEye system consists of the following components:
 - Implement NATS integration to facilitate real-time communication and event-driven data processing.
 - When an event, such as human detection or motion detection, occurs,
 
- the system can publish relevant data to NATS topics.
+the system can publish relevant data to NATS topics.
+
 - Users with active subscriptions can subscribe to specific NATS topics to receive real-time notifications or data updates.
 - Implement logic to manage subscription status in the "Subscriptions Table" (e.g., activate, deactivate, update preferences).
 - Users can customize their subscription preferences, such as specifying which events they want to be notified about and through which channels (email, SMS, NATS).

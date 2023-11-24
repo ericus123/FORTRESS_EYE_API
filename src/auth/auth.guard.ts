@@ -9,11 +9,16 @@ import { GqlExecutionContext } from "@nestjs/graphql";
 import { JwtService } from "../jwt/jwt.service";
 import { RoleName } from "../role/role.model";
 import { ROLES_KEY } from "./auth.decorators";
+import { AuthService } from "./auth.service";
 import { AuthErrors } from "./constants";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private reflector: Reflector) {}
+  constructor(
+    private jwtService: JwtService,
+    private reflector: Reflector,
+    private readonly authService: AuthService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
@@ -74,6 +79,18 @@ export class AuthGuard implements CanActivate {
     ) {
       throw new UnauthorizedException(AuthErrors.INSUFFICIENT_ROLE);
     }
+
+    if (
+      this.authService.isTokenBlacklisted({
+        email: payload.data.email,
+        token: accessToken,
+      })
+    ) {
+      res.setHeader("Authorization", null);
+      res.setHeader("x-refresh-token", null);
+      throw new UnauthorizedException(AuthErrors.SESSION_EXIRED);
+    }
+
     return true;
   }
 

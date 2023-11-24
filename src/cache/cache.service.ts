@@ -1,18 +1,54 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { Cache } from "cache-manager";
+import { Injectable, Logger } from "@nestjs/common";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const NodeCache = require("node-cache");
 
 @Injectable()
 export class CacheService {
-  constructor(@Inject("CACHE_MANAGER") private readonly cacheManager: Cache) {}
+  myCache: typeof NodeCache;
+  logger: Logger = new Logger("CacheService");
 
-  async set(key: string, value: any, ttl: number): Promise<void> {
-    await this.cacheManager.set(key, value, ttl);
+  constructor(logger: Logger) {
+    this.myCache = new NodeCache();
+    this.logger = logger;
+
+    this.myCache.on("set", (key, value) => {
+      this.logger.log(`Redis key ${key} set with value ${value}`);
+    });
+
+    this.myCache.on("del", (key, value) => {
+      this.logger.log(`Redis key ${key} deleted with value ${value}`);
+    });
+
+    this.myCache.on("expired", (key, value) => {
+      this.logger.log(`Redis key ${key} expired with value ${value}`);
+    });
+
+    this.myCache.on("flush", () => {
+      this.logger.log("Cache flushed");
+    });
   }
 
-  async get(key: string): Promise<any> {
-    return this.cacheManager.get(key);
+  async set(key: string, value: any, ttl: number): Promise<boolean> {
+    return this.myCache.set(key, value, ttl);
   }
-  async delete(key: string): Promise<any> {
-    return this.cacheManager.get(key);
+
+  async get(key: string): Promise<typeof NodeCache.Key> {
+    return this.myCache.get(key);
+  }
+
+  async delete(key: string): Promise<typeof NodeCache.Key> {
+    return this.myCache.del(key);
+  }
+
+  async flush() {
+    return this.myCache.flushAll();
+  }
+
+  async flushStats() {
+    return this.myCache.flushStats();
+  }
+
+  async getStats(): Promise<typeof NodeCache.Stats> {
+    return this.myCache.getStats();
   }
 }
