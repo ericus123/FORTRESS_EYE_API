@@ -98,6 +98,11 @@ export class User extends Model<User> {
   @Column({ type: DataType.BOOLEAN })
   isVerified: boolean;
 
+  @Field()
+  @Default(() => false)
+  @Column({ type: DataType.BOOLEAN })
+  isComplete: boolean;
+
   @ForeignKey(() => Role)
   @Column({ type: DataType.STRING })
   roleId: string;
