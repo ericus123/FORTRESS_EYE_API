@@ -29,12 +29,6 @@ export class AuthService {
 
   async signin({ email, password }: SigninInput): Promise<AuthResponse> {
     try {
-      // const user = await this.userModel.findOne({
-      //   where: {
-      //     email,
-      //   },
-      // });
-
       const user = await this.userService.getUser({
         type: "EMAIL",
         value: email,
@@ -112,12 +106,7 @@ export class AuthService {
   async isTokenBlacklisted({ email, token }: { email: string; token: string }) {
     try {
       const _blacklist = await this.cacheService.get(`blacklist-${email}`);
-
-      if (_blacklist != undefined && _blacklist === token) {
-        return true;
-      }
-
-      return false;
+      return _blacklist != undefined && _blacklist != token;
     } catch (error) {
       throw new Error(error);
     }

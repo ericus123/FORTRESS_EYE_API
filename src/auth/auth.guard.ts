@@ -22,7 +22,14 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
-    const { headers, res } = ctx.getContext().req;
+    let request = context.switchToHttp().getRequest();
+
+    if (!request) {
+      const ctx = GqlExecutionContext.create(context);
+      request = ctx.getContext().req;
+    }
+
+    const { headers, res } = request;
 
     const accessToken = this.extractTokenFromHeader(headers);
     const refreshToken = headers["x-refresh-token"];
@@ -48,9 +55,9 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException(AuthErrors.INVALID_TOKEN);
     }
 
-    if (payload?.data?.isVerified !== true) {
-      throw new UnauthorizedException(AuthErrors.UNVERIFIED_ACCOUNT);
-    }
+    // if (payload?.data?.isVerified !== true) {
+    //   throw new UnauthorizedException(AuthErrors.UNVERIFIED_ACCOUNT);
+    // }
 
     if (
       payload.exp - Date.now() <
@@ -80,17 +87,17 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException(AuthErrors.INSUFFICIENT_ROLE);
     }
 
-    if (
-      this.authService.isTokenBlacklisted({
-        email: payload.data.email,
-        token: accessToken,
-      })
-    ) {
+    const isBlacklisted = await this.authService.isTokenBlacklisted({
+      email: payload.data.email,
+      token: accessToken,
+    });
+    if (isBlacklisted) {
       res.setHeader("Authorization", null);
       res.setHeader("x-refresh-token", null);
       throw new UnauthorizedException(AuthErrors.SESSION_EXIRED);
     }
 
+    request.userEmail = payload.data.email;
     return true;
   }
 

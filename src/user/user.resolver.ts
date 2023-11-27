@@ -1,11 +1,15 @@
 import { UseGuards } from "@nestjs/common";
-import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Roles } from "../auth/auth.decorators";
 import { AuthGuard } from "../auth/auth.guard";
 import { RoleName } from "../role/role.model";
 import { User } from "./user.model";
 import { UserService } from "./user.service";
-import { GetUserInput, UserVerification } from "./user.types";
+import {
+  CompleteProfileInput,
+  GetUserInput,
+  UserVerification,
+} from "./user.types";
 @Resolver("UsersResolver")
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
@@ -43,5 +47,15 @@ export class UserResolver {
     @Args("token") token: string,
   ): Promise<boolean> {
     return this.userService.resetPassword({ password, token });
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => User)
+  async completeProfile(
+    @Args("email") email: string,
+    @Args("input") input: CompleteProfileInput,
+    @Context("req") req,
+  ) {
+    return this.userService.completeProfile({ input, email: req.userEmail });
   }
 }

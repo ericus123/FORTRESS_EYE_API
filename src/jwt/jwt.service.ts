@@ -37,6 +37,7 @@ export class JwtService {
 
   async generateAuthTokens(payload: TokenData): Promise<AuthResponse> {
     try {
+      await this.cacheService.delete(`blacklist-${payload.email}`);
       const accessToken = await this.generateToken(
         {
           data: {
@@ -79,6 +80,8 @@ export class JwtService {
 
   async refreshAccessToken(payload: TokenData): Promise<string> {
     try {
+      //remove from blacklisted tokens
+      await this.cacheService.delete(`blacklist-${payload.email}`);
       return await this.generateToken(
         {
           data: {

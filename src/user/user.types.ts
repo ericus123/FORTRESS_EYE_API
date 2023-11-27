@@ -2,11 +2,14 @@ import { Field, InputType, ObjectType } from "@nestjs/graphql";
 import {
   IsEmail,
   IsNotEmpty,
+  IsPhoneNumber,
   IsStrongPassword,
+  IsUrl,
+  Length,
   MaxLength,
   MinLength,
 } from "class-validator";
-import { Column, DataType } from "sequelize-typescript";
+import { Column, DataType, Unique } from "sequelize-typescript";
 
 export type UserFindType = "EMAIL" | "ID";
 @InputType()
@@ -71,6 +74,34 @@ export class SignupInput {
   @IsStrongPassword()
   @Column({ type: DataType.STRING })
   password: string;
+}
+
+@InputType()
+@ObjectType()
+export class CompleteProfileInput {
+  @Field({ nullable: true })
+  @IsUrl({}, { message: "Invalid URL format for avatar" })
+  @Column({ type: DataType.STRING })
+  avatar: string;
+
+  @Field({ nullable: true })
+  @IsPhoneNumber(null, { message: "Invalid phone number" })
+  @Length(1, 15, {
+    message: "Phone number must be between 1 and 15 characters",
+  })
+  @Column({ type: DataType.STRING })
+  phoneNumber: string;
+
+  @Field({ nullable: true })
+  @Unique
+  @Length(1, 255, { message: "Username must be between 1 and 255 characters" })
+  @Column({ type: DataType.STRING })
+  username: string;
+
+  @Field({ nullable: true })
+  @Length(1, 255, { message: "Bio must be between 1 and 255 characters" })
+  @Column({ type: DataType.STRING })
+  bio: string;
 }
 
 export enum TokenType {

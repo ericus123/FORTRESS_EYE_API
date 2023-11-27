@@ -15,7 +15,12 @@ import { Permission } from "../permission/permission.model";
 import { Role, RoleName } from "../role/role.model";
 import { RoleService } from "../role/role.service";
 import { User } from "./user.model";
-import { GetUserInput, SignupInput, TokenType } from "./user.types";
+import {
+  CompleteProfileInput,
+  GetUserInput,
+  SignupInput,
+  TokenType,
+} from "./user.types";
 
 class UnknownUserException extends NotFoundException {
   constructor() {
@@ -128,15 +133,27 @@ export class UserService {
     }
   }
 
-  async completeProfile({ input }: { input: any }) {
+  async completeProfile({
+    input,
+    email,
+  }: {
+    input: CompleteProfileInput;
+    email: string;
+  }): Promise<User> {
     try {
-      const user = this.getUser({
+      const user = await this.getUser({
         type: "EMAIL",
-        value: input,
+        value: email,
       });
       if (!user) {
         throw new Error("Unknown user");
       }
+
+      if (user.isComplete) {
+        throw new BadRequestException("Your profile is already complete");
+      }
+
+      return await user.update(input);
     } catch (error) {
       throw new Error(error);
     }
