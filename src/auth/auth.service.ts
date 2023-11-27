@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
+import { CacheService } from "../cache/cache.service";
 import HashingService from "../crypto/hashing.service";
 import { JwtService } from "../jwt/jwt.service";
 import { RoleName } from "../role/role.model";
@@ -22,6 +23,7 @@ export class AuthService {
     @InjectModel(User)
     private readonly userModel: typeof User,
     private readonly hashingService: HashingService,
+    private readonly cacheService: CacheService,
     private jwtService: JwtService,
   ) {}
 
@@ -95,8 +97,29 @@ export class AuthService {
     }
   }
 
-  async signout() {
+  async signout({ email, token }: { email: string; token: string }) {
     try {
-    } catch (error) {}
+      this.cacheService.set(
+        `blacklist-${email}`,
+        token,
+        Number(process.env.SIGNOUT_EXP),
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async isTokenBlacklisted({ email, token }: { email: string; token: string }) {
+    try {
+      const _blacklist = await this.cacheService.get(`blacklist-${email}`);
+
+      if (_blacklist != undefined && _blacklist === token) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }

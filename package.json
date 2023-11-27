@@ -57,6 +57,7 @@
     "jsonwebtoken": "^9.0.2",
     "mercurius": "^13.1.0",
     "mqtt": "^5.0.5",
+    "node-cache": "^5.1.2",
     "nodemailer": "^6.9.5",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",

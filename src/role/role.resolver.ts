@@ -2,10 +2,10 @@ import { UseGuards } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Roles } from "../auth/auth.decorators";
 import { AuthGuard } from "../auth/auth.guard";
-import { AssignRoleInput, Role, RoleInput } from "./role.model";
+import { AssignRoleInput, Role, RoleInput, RoleName } from "./role.model";
 import { RoleService } from "./role.service";
 @UseGuards(AuthGuard)
-@Roles("SuperAdmin")
+@Roles(RoleName.SUPER_ADMIN)
 @Resolver("RoleResolver")
 export class RoleResolver {
   constructor(private readonly roleService: RoleService) {}
