@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { ThrottlerModule } from "@nestjs/throttler";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AreaModule } from "./area/area.module";
@@ -12,13 +13,29 @@ import { JwtModule } from "./jwt/jwt.module";
 import { MailModule } from "./mail/mail.module";
 import { MqttModule } from "./mqtt/mqtt.module";
 import { UserModule } from "./user/user.module";
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: "short",
+        ttl: 1000,
+        limit: 3,
+      },
+      {
+        name: "medium",
+        ttl: 10000,
+        limit: 20,
+      },
+      {
+        name: "long",
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     AreaModule,
     DatabaseModule,
     CacheModule,
