@@ -1,15 +1,9 @@
 import { UseGuards, UsePipes } from "@nestjs/common";
 import { Args, Mutation, Resolver } from "@nestjs/graphql";
-import { FastifyReply, FastifyRequest } from "fastify";
 import { AuthResponse, SigninInput, SignupInput } from "../user/user.types";
 import { ValidationPipe } from "../validations/validation.pipe";
 import { AuthGuard } from "./auth.guard";
 import { AuthService } from "./auth.service";
-
-export type FastifyContext = {
-  reply: FastifyReply;
-  request: FastifyRequest;
-};
 
 @Resolver("AuthResolver")
 export class AuthResolver {
@@ -24,8 +18,14 @@ export class AuthResolver {
 
   @Mutation(() => AuthResponse, { name: "SignupUser" })
   @UsePipes(new ValidationPipe())
-  async signup(@Args("user") input: SignupInput): Promise<AuthResponse> {
-    const { accessToken, refreshToken } = await this.authService.signup(input);
+  async signup(
+    @Args("user") input: SignupInput,
+    @Args("token") token: string,
+  ): Promise<AuthResponse> {
+    const { accessToken, refreshToken } = await this.authService.signup(
+      input,
+      token,
+    );
     return { accessToken, refreshToken };
   }
 

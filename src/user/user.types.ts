@@ -109,4 +109,5 @@ export enum TokenType {
   "Refresh" = "Refresh",
   "Verification" = "Verification",
   "Reset" = "Reset",
+  "Invitation" = "Invitation",
 }

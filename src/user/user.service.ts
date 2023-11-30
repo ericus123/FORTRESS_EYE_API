@@ -7,6 +7,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { InjectModel } from "@nestjs/sequelize";
 import * as jwt from "jsonwebtoken";
+import { AuthErrors } from "../auth/constants";
 import HashingService from "../crypto/hashing.service";
 import { InvalidTokenException, JwtService } from "../jwt/jwt.service";
 import { MailService } from "../mail/mail.service";
@@ -56,6 +57,7 @@ export class UserService {
   async addUser(input: SignupInput): Promise<User> {
     try {
       input.password = await this.hashingService.hash(input.password);
+
       const user = await this.userModel.create(input);
       const defaultRole = await this.roleService.getRole({
         type: "roleName",
@@ -292,6 +294,44 @@ export class UserService {
       this.logger.debug("new role assigned to ", email);
     } catch (error) {
       this.logger.error(error);
+      throw new Error(error);
+    }
+  }
+
+  async sendInvitation({ email }: { email: string }) {
+    try {
+      const token = await this.jwtService.generateToken(
+        {
+          email,
+          type: TokenType.Invitation,
+        },
+        { expiresIn: "30m" },
+      );
+
+      const template = this.mailService.getInvitationTemplate({
+        token,
+      });
+      await this.mailService.sendEmail({
+        to: email,
+        subject: "Invitation email",
+        text: template,
+      });
+      this.logger.debug(`Sent ${email} an invitation to join the system`);
+      return true;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async verifyInvitationToken({ token }: { token: string }): Promise<string> {
+    try {
+      const payload: any = await this.jwtService.verifyToken(token);
+      if (!payload || !payload?.email) {
+        throw new BadRequestException(AuthErrors.INVALID_TOKEN);
+      }
+
+      return payload.email;
+    } catch (error) {
       throw new Error(error);
     }
   }

@@ -58,4 +58,9 @@ export class UserResolver {
   ) {
     return this.userService.completeProfile({ input, email: req.userEmail });
   }
+
+  @Mutation(() => Boolean)
+  async InviteUser(@Args("email") email: string): Promise<boolean> {
+    return this.userService.sendInvitation({ email });
+  }
 }

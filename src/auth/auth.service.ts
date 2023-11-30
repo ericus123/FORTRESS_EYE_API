@@ -61,17 +61,23 @@ export class AuthService {
     }
   }
 
-  async signup(input: SignupInput): Promise<AuthResponse> {
+  async signup(input: SignupInput, token: string): Promise<AuthResponse> {
+    const email = await this.userService.verifyInvitationToken({ token });
+
     const exist = await this.userService.getUser({
       type: "EMAIL",
-      value: input?.email,
+      value: email,
     });
 
     if (exist) {
       throw new UnauthorizedException(AuthErrors.ALREADY_REGISTERED);
     }
 
-    const res = await this.userService.addUser(input);
+    if (email != input.email) {
+      throw new UnauthorizedException(AuthErrors.UNAUTHORIZED_REQUEST);
+    }
+
+    const res = await this.userService.addUser({ ...input, email });
     const user = await this.userService.getUser({
       type: "EMAIL",
       value: res.email,

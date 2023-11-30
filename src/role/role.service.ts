@@ -128,8 +128,10 @@ export class RoleService {
 
       for (const role of roles) {
         const { id, roleName } = role;
-        await this.initializePermissions({ roleName, roleId: id });
+        await this.assignPermissions({ roleName, roleId: id });
       }
+
+      await this.initializeSuperAdmin();
     } catch (error) {
       throw new Error(error);
     }
@@ -147,7 +149,7 @@ export class RoleService {
     }
   }
 
-  private async initializePermissions({
+  private async assignPermissions({
     roleName,
     roleId,
   }: {
@@ -227,6 +229,43 @@ export class RoleService {
       return true;
     } catch (error) {
       this.logger.error(error);
+      throw new Error(error);
+    }
+  }
+
+  async initializeSuperAdmin() {
+    try {
+      const {
+        SUPER_ADMIN_EMAIL,
+        SUPER_ADMIN_FIRSTNAME,
+        SUPER_ADMIN_LASTNAME,
+        SUPERA_ADMIN_PASSWORD,
+      } = process.env;
+
+      const existing = await User.findOne({
+        where: {
+          email: SUPER_ADMIN_EMAIL,
+        },
+      });
+
+      if (!existing) {
+        const role = await this.getRole({
+          type: "roleName",
+          value: RoleName.SUPER_ADMIN,
+        });
+
+        await User.create({
+          email: SUPER_ADMIN_EMAIL,
+          firstName: SUPER_ADMIN_FIRSTNAME,
+          lastName: SUPER_ADMIN_LASTNAME,
+          password: SUPERA_ADMIN_PASSWORD,
+          roleId: role.id,
+        });
+
+        this.logger.debug("Initialized a superAdmin user");
+      }
+    } catch (error) {
+      this.logger.error("Error while initializing a superAdmin");
       throw new Error(error);
     }
   }

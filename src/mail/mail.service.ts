@@ -91,6 +91,17 @@ export class MailService {
     }
   }
 
+  getInvitationTemplate({ token }: { token: string }): string {
+    try {
+      return `Hello,
+          you've been invited to join FortressEye.
+          Use the link below to get started ${token}
+          `;
+    } catch (error) {
+      throw new Error("Something went wrong");
+    }
+  }
+
   private async getAccessToken(): Promise<string> {
     try {
       const { token } = await this.authClient.getAccessToken();
