@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
+import HashingService from "../crypto/hashing.service";
 import { assignUUID } from "../helpers";
 import { Permission, rolePermissions } from "../permission/permission.model";
 import { PermissionService } from "../permission/permission.service";
@@ -24,6 +25,7 @@ export class RoleService {
     @InjectModel(Role)
     private readonly roleModel: typeof Role,
     private readonly permissionService: PermissionService,
+    private readonly hashingService: HashingService,
 
     @InjectModel(User)
     private readonly userModel: typeof User,
@@ -128,8 +130,10 @@ export class RoleService {
 
       for (const role of roles) {
         const { id, roleName } = role;
-        await this.initializePermissions({ roleName, roleId: id });
+        await this.assignPermissions({ roleName, roleId: id });
       }
+
+      await this.initializeSuperAdmin();
     } catch (error) {
       throw new Error(error);
     }
@@ -147,7 +151,7 @@ export class RoleService {
     }
   }
 
-  private async initializePermissions({
+  private async assignPermissions({
     roleName,
     roleId,
   }: {
@@ -227,6 +231,44 @@ export class RoleService {
       return true;
     } catch (error) {
       this.logger.error(error);
+      throw new Error(error);
+    }
+  }
+
+  async initializeSuperAdmin() {
+    try {
+      const {
+        SUPER_ADMIN_EMAIL,
+        SUPER_ADMIN_FIRSTNAME,
+        SUPER_ADMIN_LASTNAME,
+        SUPER_ADMIN_PASSWORD,
+      } = process.env;
+
+      const existing = await User.findOne({
+        where: {
+          email: SUPER_ADMIN_EMAIL,
+        },
+      });
+
+      if (!existing) {
+        const role = await this.getRole({
+          type: "roleName",
+          value: RoleName.SUPER_ADMIN,
+        });
+
+        const password = await this.hashingService.hash(SUPER_ADMIN_PASSWORD);
+        await User.create({
+          email: SUPER_ADMIN_EMAIL,
+          firstName: SUPER_ADMIN_FIRSTNAME,
+          lastName: SUPER_ADMIN_LASTNAME,
+          password,
+          roleId: role.id,
+        });
+
+        this.logger.debug("Initialized a superAdmin user");
+      }
+    } catch (error) {
+      this.logger.error("Error while initializing a superAdmin");
       throw new Error(error);
     }
   }

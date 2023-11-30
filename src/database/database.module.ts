@@ -38,10 +38,10 @@ import { UserService } from "../user/user.service";
         models: [User, Area, Role, Permission, PermissionRole],
 
         autoLoadModels: true,
-        // synchronize: true,
+        synchronize: process.env.ALTER_TABLES == "true" ? true : false,
         sync: {
           // alter: true,
-          force: false,
+          force: true,
         },
       }),
       inject: [ConfigService],
