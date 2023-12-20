@@ -30,6 +30,7 @@ async function bootstrap() {
       password: config.get<string>("MQTT_PASS"),
     },
   });
+  app.enableCors();
   await app.startAllMicroservices();
   await app.listen(process.env.PORT, "0.0.0.0");
   logger.debug(`Server is running at ${await app.getUrl()}`);

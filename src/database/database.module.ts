@@ -40,8 +40,8 @@ import { UserService } from "../user/user.service";
         autoLoadModels: true,
         synchronize: process.env.ALTER_TABLES == "true" ? true : false,
         sync: {
-          // alter: true,
-          force: true,
+          alter: true,
+          force: false,
         },
       }),
       inject: [ConfigService],

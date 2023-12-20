@@ -97,13 +97,20 @@ export class AuthService {
     }
   }
 
-  async signout({ email, token }: { email: string; token: string }) {
+  async signout({
+    email,
+    token,
+  }: {
+    email: string;
+    token: string;
+  }): Promise<boolean> {
     try {
-      this.cacheService.set(
+      const tok = await this.cacheService.set(
         `blacklist-${email}`,
         token,
         Number(process.env.SIGNOUT_EXP),
       );
+      return true;
     } catch (error) {
       throw new Error(error);
     }
@@ -112,7 +119,7 @@ export class AuthService {
   async isTokenBlacklisted({ email, token }: { email: string; token: string }) {
     try {
       const _blacklist = await this.cacheService.get(`blacklist-${email}`);
-      return _blacklist != undefined && _blacklist != token;
+      return _blacklist === token;
     } catch (error) {
       throw new Error(error);
     }

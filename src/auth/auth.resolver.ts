@@ -1,5 +1,5 @@
 import { UseGuards, UsePipes } from "@nestjs/common";
-import { Args, Mutation, Resolver } from "@nestjs/graphql";
+import { Args, Context, Mutation, Resolver } from "@nestjs/graphql";
 import { AuthResponse, SigninInput, SignupInput } from "../user/user.types";
 import { ValidationPipe } from "../validations/validation.pipe";
 import { AuthGuard } from "./auth.guard";
@@ -31,7 +31,8 @@ export class AuthResolver {
 
   @UseGuards(AuthGuard)
   @Mutation(() => Boolean, { name: "SignoutUser" })
-  async signout(@Args("email") email: string, @Args("token") token: string) {
-    return this.authService.signout({ email, token });
+  async signout(@Context() context: any) {
+    const { userEmail, token } = context.req;
+    return this.authService.signout({ email: userEmail, token });
   }
 }

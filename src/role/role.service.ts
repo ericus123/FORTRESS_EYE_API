@@ -263,6 +263,7 @@ export class RoleService {
           lastName: SUPER_ADMIN_LASTNAME,
           password,
           roleId: role.id,
+          isVerified: true,
         });
 
         this.logger.debug("Initialized a superAdmin user");

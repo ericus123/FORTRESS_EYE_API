@@ -12,8 +12,8 @@ export class AppController {
     private readonly configService: ConfigService,
   ) {}
 
-  @Get()
-  async getHello() {
-    this.logger.debug("Fortress eye");
+  @Get("/")
+  getHome() {
+    return "Hello World 🚀";
   }
 }

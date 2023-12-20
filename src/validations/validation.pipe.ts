@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
+import { AuthErrors } from "../auth/constants";
 
 @Injectable()
 export class ValidationPipe implements PipeTransform<any> {
@@ -20,7 +21,7 @@ export class ValidationPipe implements PipeTransform<any> {
     const errors = await validate(object);
 
     if (errors.length > 0) {
-      throw new BadRequestException("Invalid input");
+      throw new BadRequestException(AuthErrors.INVALID_INPUT);
     }
 
     return value;

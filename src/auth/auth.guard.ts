@@ -98,6 +98,7 @@ export class AuthGuard implements CanActivate {
     }
 
     request.userEmail = payload.data.email;
+    request.token = accessToken;
     return true;
   }
 
