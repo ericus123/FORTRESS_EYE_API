@@ -57,12 +57,12 @@ export class MailService {
   }
 
   async sendEmail(options: mailOptions): Promise<void> {
-    const { to, subject, text } = options;
+    const { to, subject, text, html } = options;
     const mailOptions = {
       from: this.configService.get<string>("GMAIL_CLIENT_MAIL"),
       to,
       subject,
-      text,
+      html,
     };
 
     try {
@@ -74,22 +74,27 @@ export class MailService {
     }
   }
 
-  getVerificationTemplate({
-    firstName,
-    token,
-  }: {
-    firstName: string;
-    token: string;
-  }): string {
+  getVerificationTemplate = ({ firstName, token }) => {
     try {
-      return `Hi ${firstName},
-          Thanks for creating account in FortressEye.
-          Use the link below to verify your account ${token}
-          `;
+      return `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Email Verification</title>
+            </head>
+            <body>
+                <p>Hi ${firstName},</p>
+                <p>Thanks for creating an account in FortressEye.</p>
+                <p>Click <a href="${process.env.FRONTEND_URL}/dashboard?verify=${token}">here</a> to verify your account</p>
+            </body>
+            </html>
+        `;
     } catch (error) {
       throw new Error("Something went wrong");
     }
-  }
+  };
 
   getInvitationTemplate({ token }: { token: string }): string {
     try {

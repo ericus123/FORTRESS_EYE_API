@@ -21,11 +21,6 @@ export class GetUserInput {
   value: string;
 }
 
-@ObjectType()
-export class UserVerification {
-  @Field({ nullable: false })
-  verified: boolean;
-}
 @InputType()
 @ObjectType()
 export class SigninInput {

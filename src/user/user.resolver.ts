@@ -5,11 +5,7 @@ import { AuthGuard } from "../auth/auth.guard";
 import { RoleName } from "../role/role.model";
 import { User } from "./user.model";
 import { UserService } from "./user.service";
-import {
-  CompleteProfileInput,
-  GetUserInput,
-  UserVerification,
-} from "./user.types";
+import { AuthResponse, CompleteProfileInput, GetUserInput } from "./user.types";
 @Resolver("UsersResolver")
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
@@ -27,13 +23,11 @@ export class UserResolver {
     return this.userService.getUsers();
   }
 
-  @Mutation(() => UserVerification, { name: "VerifyUser" })
-  async verifyUser(
-    @Args("token") token: string,
-  ): Promise<{ verified: boolean }> {
+  @Mutation(() => AuthResponse, { name: "VerifyUser" })
+  async VerifyUser(@Args("token") token: string): Promise<AuthResponse> {
     return this.userService.verifyUser({ token });
   }
-  @Query(() => Boolean, { name: "RequestPasswordReset" })
+  @Mutation(() => Boolean, { name: "RequestPasswordReset" })
   async requestPasswordReset(
     @Args("firstName") firstName: string,
     @Args("email") email: string,
@@ -62,5 +56,10 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async InviteUser(@Args("email") email: string): Promise<boolean> {
     return this.userService.sendInvitation({ email });
+  }
+
+  @Mutation(() => Boolean)
+  async SendVerification(@Args("email") email: string): Promise<void> {
+    return this.userService.sendVerificationEmail(email);
   }
 }

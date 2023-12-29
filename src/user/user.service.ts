@@ -7,6 +7,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { InjectModel } from "@nestjs/sequelize";
 import * as jwt from "jsonwebtoken";
+import { TokenData } from "../auth/auth.service";
 import { AuthErrors } from "../auth/constants";
 import HashingService from "../crypto/hashing.service";
 import { InvalidTokenException, JwtService } from "../jwt/jwt.service";
@@ -17,6 +18,7 @@ import { Role, RoleName } from "../role/role.model";
 import { RoleService } from "../role/role.service";
 import { User } from "./user.model";
 import {
+  AuthResponse,
   CompleteProfileInput,
   GetUserInput,
   SignupInput,
@@ -69,6 +71,28 @@ export class UserService {
       const { firstName, email } = user;
       await this.sendMail({ firstName, email, type: TokenType.Verification });
       return user;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async sendVerificationEmail(email: string) {
+    try {
+      const user = await this.getUser({
+        type: "EMAIL",
+        value: email,
+      });
+
+      if (!user) {
+        throw new NotFoundException(AuthErrors.UNKNOWN_USER);
+      }
+
+      if (user?.isVerified) {
+        throw new BadRequestException(AuthErrors.ACCOUNT_ALREADY_VERIFIED);
+      } else {
+        const { firstName, email } = user;
+        await this.sendMail({ firstName, email, type: TokenType.Verification });
+      }
     } catch (error) {
       throw new Error(error);
     }
@@ -173,8 +197,10 @@ export class UserService {
     try {
       const token = await this.jwtService.generateToken(
         {
-          email,
-          type,
+          data: {
+            email,
+            type,
+          },
         },
         { expiresIn: "5m" },
       );
@@ -186,26 +212,29 @@ export class UserService {
       await this.mailService.sendEmail({
         to: email,
         subject: "Verification email",
-        text: template,
+        html: template,
       });
     } catch (error) {
       throw new Error("Something went wrong");
     }
   }
 
-  async verifyUser({
-    token,
-  }: {
-    token: string;
-  }): Promise<{ verified: boolean }> {
+  async verifyUser({ token }: { token: string }): Promise<AuthResponse> {
     await this.jwtService.verifyToken(token);
     const _token: any = jwt.decode(token);
 
-    if (!_token?.email || !_token?.type || _token?.type != "Verification") {
+    if (
+      !_token?.data?.email ||
+      !_token?.data?.type ||
+      _token?.data?.type != "Verification"
+    ) {
       throw new InvalidTokenException();
     }
 
-    const user = await this.getUser({ type: "EMAIL", value: _token?.email });
+    const user = await this.getUser({
+      type: "EMAIL",
+      value: _token?.data?.email,
+    });
 
     if (!user) {
       throw new UnknownUserException();
@@ -218,7 +247,16 @@ export class UserService {
     try {
       user.isVerified = true;
       await user.save();
-      return { verified: user.isVerified };
+
+      const payload: TokenData = {
+        sub: user.id,
+        email: user.email,
+        isVerified: user.isVerified,
+        role: user.role.roleName,
+      };
+
+      const tokens = await this.jwtService.generateAuthTokens(payload);
+      return tokens;
     } catch (error) {
       throw new Error("Something went wrong");
     }
@@ -311,6 +349,7 @@ export class UserService {
       const template = this.mailService.getInvitationTemplate({
         token,
       });
+
       await this.mailService.sendEmail({
         to: email,
         subject: "Invitation email",
