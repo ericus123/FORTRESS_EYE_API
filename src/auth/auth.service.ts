@@ -91,6 +91,8 @@ export class AuthService {
           role: role.roleName,
           isVerified,
         });
+
+      await this.cacheService.set(`blacklist-${email}`, token, 30000);
       return { accessToken, refreshToken };
     } catch (error) {
       throw new Error(error);

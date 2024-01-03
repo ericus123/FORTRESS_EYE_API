@@ -17,7 +17,6 @@ export class UserResolver {
     return this.userService.getUser(input);
   }
   @UseGuards(AuthGuard)
-  @Roles(RoleName.SUPER_ADMIN, RoleName.ADMIN)
   @Query(() => [User], { name: "GetUsers" })
   async getUsers(): Promise<User[]> {
     return this.userService.getUsers();
@@ -28,11 +27,8 @@ export class UserResolver {
     return this.userService.verifyUser({ token });
   }
   @Mutation(() => Boolean, { name: "RequestPasswordReset" })
-  async requestPasswordReset(
-    @Args("firstName") firstName: string,
-    @Args("email") email: string,
-  ): Promise<boolean> {
-    return this.userService.requestPasswordReset({ firstName, email });
+  async requestPasswordReset(@Args("email") email: string): Promise<boolean> {
+    return this.userService.requestPasswordReset({ email });
   }
 
   @Mutation(() => Boolean, { name: "ResetPassword" })
@@ -53,6 +49,8 @@ export class UserResolver {
     return this.userService.completeProfile({ input, email: req.userEmail });
   }
 
+  @UseGuards(AuthGuard)
+  @Roles(RoleName.SUPER_ADMIN)
   @Mutation(() => Boolean)
   async InviteUser(@Args("email") email: string): Promise<boolean> {
     return this.userService.sendInvitation({ email });

@@ -19,7 +19,7 @@ export class AuthResolver {
   @Mutation(() => AuthResponse, { name: "SignupUser" })
   @UsePipes(new ValidationPipe())
   async signup(
-    @Args("user") input: SignupInput,
+    @Args("input") input: SignupInput,
     @Args("token") token: string,
   ): Promise<AuthResponse> {
     const { accessToken, refreshToken } = await this.authService.signup(

@@ -96,11 +96,43 @@ export class MailService {
     }
   };
 
+  requestPasswordResetTemplate = ({ firstName, token }) => {
+    try {
+      return `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Password Reset</title>
+            </head>
+            <body>
+                <p>Hi ${firstName},</p>
+                <p>Sorry to hear that you forgot your password.</p>
+                <p>Click <a href="${process.env.FRONTEND_URL}/forgot-password?reset=${token}">here</a> to reset your password</p>
+            </body>
+            </html>
+        `;
+    } catch (error) {
+      throw new Error("Something went wrong");
+    }
+  };
+
   getInvitationTemplate({ token }: { token: string }): string {
     try {
-      return `Hello,
-          you've been invited to join FortressEye.
-          Use the link below to get started ${token}
+      return `        <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Invitation to Join FortressEye</title>
+      </head>
+      <body>
+          <p>Hello,</p>
+          <p>You've been invited to join FortressEye.</p>
+          <p>Click <a href="${process.env.FRONTEND_URL}/invitation?token=${token}">here</a> to join the system</p>
+      </body>
+      </html>
           `;
     } catch (error) {
       throw new Error("Something went wrong");

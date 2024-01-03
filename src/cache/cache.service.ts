@@ -51,4 +51,7 @@ export class CacheService {
   async getStats(): Promise<typeof NodeCache.Stats> {
     return this.myCache.getStats();
   }
+  async isBlacklisted(key: string, value: any) {
+    return this.myCache.get(`blacklist-${key}`) === value;
+  }
 }

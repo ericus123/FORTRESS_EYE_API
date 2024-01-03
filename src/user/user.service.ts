@@ -4,11 +4,11 @@ import {
   Logger,
   NotFoundException,
 } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { InjectModel } from "@nestjs/sequelize";
 import * as jwt from "jsonwebtoken";
 import { TokenData } from "../auth/auth.service";
 import { AuthErrors } from "../auth/constants";
+import { CacheService } from "../cache/cache.service";
 import HashingService from "../crypto/hashing.service";
 import { InvalidTokenException, JwtService } from "../jwt/jwt.service";
 import { MailService } from "../mail/mail.service";
@@ -53,7 +53,7 @@ export class UserService {
     private readonly roleService: RoleService,
     private readonly mailService: MailService,
     private jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly cacheService: CacheService,
   ) {}
 
   async addUser(input: SignupInput): Promise<User> {
@@ -205,13 +205,23 @@ export class UserService {
         { expiresIn: "5m" },
       );
 
-      const template = this.mailService.getVerificationTemplate({
-        firstName,
-        token,
-      });
+      const template =
+        type === TokenType.Verification
+          ? this.mailService.getVerificationTemplate({
+              firstName,
+              token,
+            })
+          : type === TokenType.Reset
+          ? this.mailService.requestPasswordResetTemplate({ firstName, token })
+          : "";
       await this.mailService.sendEmail({
         to: email,
-        subject: "Verification email",
+        subject:
+          type === TokenType.Verification
+            ? "Verification email"
+            : type === TokenType.Reset
+            ? "Password Reset"
+            : "Greetings!",
         html: template,
       });
     } catch (error) {
@@ -228,6 +238,15 @@ export class UserService {
       !_token?.data?.type ||
       _token?.data?.type != "Verification"
     ) {
+      throw new InvalidTokenException();
+    }
+
+    const isBlacklisted = await this.cacheService.isBlacklisted(
+      _token?.data?.email,
+      token,
+    );
+
+    if (isBlacklisted) {
       throw new InvalidTokenException();
     }
 
@@ -248,6 +267,12 @@ export class UserService {
       user.isVerified = true;
       await user.save();
 
+      await this.cacheService.set(
+        `blacklist-${_token?.data?.email}`,
+        token,
+        5000,
+      );
+
       const payload: TokenData = {
         sub: user.id,
         email: user.email,
@@ -262,18 +287,25 @@ export class UserService {
     }
   }
 
-  async requestPasswordReset({
-    firstName,
-    email,
-  }: {
-    firstName: string;
-    email: string;
-  }) {
+  async requestPasswordReset({ email }: { email: string }) {
     try {
-      this.sendMail({ firstName, email, type: TokenType.Reset });
+      const user = await User.findOne({
+        where: {
+          email,
+        },
+      });
+
+      if (!user) {
+        throw new NotFoundException(AuthErrors.UNKNOWN_MEMBER);
+      }
+      await this.sendMail({
+        firstName: user?.firstName,
+        email,
+        type: TokenType.Reset,
+      });
       return true;
     } catch (error) {
-      throw new Error("Something went wrong");
+      throw new Error(error);
     }
   }
 
@@ -284,19 +316,30 @@ export class UserService {
     password: string;
     token: string;
   }) {
-    await this.jwtService.verifyToken(token);
-    const _token: any = jwt.decode(token);
-    const user = await this.getUser({ type: "EMAIL", value: _token?.email });
-    if (!_token?.email || !_token?.type || _token?.type != "Reset") {
+    const _token: any = await this.jwtService.verifyToken(token);
+    const user = await this.getUser({
+      type: "EMAIL",
+      value: _token?.data?.email,
+    });
+    if (
+      !_token?.data?.email ||
+      !_token?.data?.type ||
+      _token?.data?.type != "Reset"
+    ) {
+      throw new InvalidTokenException();
+    }
+
+    const isBlacklisted = await this.cacheService.isBlacklisted(
+      _token?.data?.email,
+      token,
+    );
+
+    if (isBlacklisted) {
       throw new InvalidTokenException();
     }
 
     if (!user) {
       throw new UnknownUserException();
-    }
-
-    if (!user.isVerified) {
-      throw new UserNotVerifiedException();
     }
 
     const passMatch = await this.hashingService.isMatch({
@@ -305,14 +348,19 @@ export class UserService {
     });
 
     if (passMatch) {
-      throw new BadRequestException(
-        "Old password and new password can't be the same",
-      );
+      throw new BadRequestException(AuthErrors.SAME_PASSWORD);
     }
+
     try {
       const newPass = await this.hashingService.hash(password);
       user.password = newPass;
+      user.isVerified = true;
       await user.save();
+      await this.cacheService.set(
+        `blacklist-${_token?.data?.email}`,
+        token,
+        5000,
+      );
       return true;
     } catch (error) {
       throw new Error("Something went wrong");
@@ -340,8 +388,10 @@ export class UserService {
     try {
       const token = await this.jwtService.generateToken(
         {
-          email,
-          type: TokenType.Invitation,
+          data: {
+            email,
+            type: TokenType.Invitation,
+          },
         },
         { expiresIn: "30m" },
       );
@@ -352,8 +402,8 @@ export class UserService {
 
       await this.mailService.sendEmail({
         to: email,
-        subject: "Invitation email",
-        text: template,
+        subject: "FortressEye Invitation",
+        html: template,
       });
       this.logger.debug(`Sent ${email} an invitation to join the system`);
       return true;
@@ -364,12 +414,27 @@ export class UserService {
 
   async verifyInvitationToken({ token }: { token: string }): Promise<string> {
     try {
-      const payload: any = await this.jwtService.verifyToken(token);
-      if (!payload || !payload?.email) {
-        throw new BadRequestException(AuthErrors.INVALID_TOKEN);
+      await this.jwtService.verifyToken(token);
+      const _token: any = jwt.decode(token);
+
+      if (
+        !_token?.data?.email ||
+        !_token?.data?.type ||
+        _token?.data?.type != TokenType.Invitation
+      ) {
+        throw new InvalidTokenException();
       }
 
-      return payload.email;
+      const isBlacklisted = await this.cacheService.isBlacklisted(
+        _token?.data?.email,
+        token,
+      );
+
+      if (isBlacklisted) {
+        throw new InvalidTokenException();
+      }
+
+      return _token?.data?.email;
     } catch (error) {
       throw new Error(error);
     }
