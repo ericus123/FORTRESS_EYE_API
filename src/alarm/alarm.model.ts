@@ -31,7 +31,7 @@ export class Alarm extends Model<Alarm> {
 
   @Field(() => String, { nullable: true })
   @Column({ type: DataType.STRING })
-  alarmName: string;
+  name: string;
 
   @ForeignKey(() => Area)
   @Field(() => String, { nullable: true })

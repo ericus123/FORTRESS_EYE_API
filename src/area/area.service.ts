@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
+import { Alarm } from "../alarm/alarm.model";
 import { Light } from "../light/light.model";
+import { Sensor } from "../sensor/sensor.model";
 import { Area } from "./area.model";
 import { AreaInput } from "./area.types";
 
@@ -26,6 +28,14 @@ export class AreaService {
           {
             model: Light,
             attributes: ["id", "isOn", "areaID", "createdAt"],
+          },
+          {
+            model: Sensor,
+            attributes: ["id", "name", "type", "value", "areaID", "createdAt"],
+          },
+          {
+            model: Alarm,
+            attributes: ["id", "name", "isOn", "areaID", "createdAt"],
           },
         ],
       });

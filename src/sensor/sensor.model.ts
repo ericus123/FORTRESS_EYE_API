@@ -40,17 +40,17 @@ export class Sensor extends Model<Sensor> {
   @Column({ type: DataType.STRING })
   areaID: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @Column({ type: DataType.STRING })
-  sensorName: string;
+  name: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @Column({ type: DataType.ENUM(...Object.values(SensorType)) })
-  sensorType: SensorType;
+  type: SensorType;
 
   @Field(() => Number, { nullable: true })
   @Column({ type: DataType.FLOAT })
-  sensorValue?: number;
+  value?: number;
 
   @Field(() => Date, { nullable: true })
   @Column({ type: DataType.DATE })
