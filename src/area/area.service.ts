@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
+import { Light } from "../light/light.model";
 import { Area } from "./area.model";
 import { AreaInput } from "./area.types";
 
@@ -20,7 +21,14 @@ export class AreaService {
 
   async getAreas(): Promise<Area[]> {
     try {
-      return await this.areaModel.findAll();
+      return await this.areaModel.findAll({
+        include: [
+          {
+            model: Light,
+            attributes: ["id", "isOn", "areaID", "createdAt"],
+          },
+        ],
+      });
     } catch (error) {
       throw new Error(error);
     }

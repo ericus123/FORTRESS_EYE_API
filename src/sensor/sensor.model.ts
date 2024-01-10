@@ -3,23 +3,20 @@ import {
   BelongsTo,
   Column,
   DataType,
+  Default,
   ForeignKey,
   Index,
   Model,
   PrimaryKey,
   Table,
 } from "sequelize-typescript";
+import { v4 as uuidv4 } from "uuid";
 import { Area } from "../area/area.model";
 
 export enum SensorType {
   TEMPERATURE = "TEMPERATURE",
   HUMIDITY = "HUMIDITY",
   MOTION = "MOTION",
-}
-
-export enum ActuatorType {
-  LIGHT_CONTROL = "LIGHT_CONTROL",
-  BUZZER_CONTROL = "BUZZER_CONTROL",
 }
 
 @ObjectType()
@@ -34,13 +31,14 @@ export class Sensor extends Model<Sensor> {
   @Field((type) => ID)
   @Index
   @PrimaryKey
-  @Column({ type: DataType.INTEGER, autoIncrement: true })
-  sensorID: number;
+  @Default(uuidv4)
+  @Column({ type: DataType.STRING })
+  id?: string = uuidv4();
 
   @ForeignKey(() => Area)
-  @Field((type) => Number)
-  @Column({ type: DataType.INTEGER })
-  areaID: number;
+  @Field(() => String, { nullable: true })
+  @Column({ type: DataType.STRING })
+  areaID: string;
 
   @Field(() => String)
   @Column({ type: DataType.STRING })
@@ -50,22 +48,23 @@ export class Sensor extends Model<Sensor> {
   @Column({ type: DataType.ENUM(...Object.values(SensorType)) })
   sensorType: SensorType;
 
-  @Field(() => Number)
+  @Field(() => Number, { nullable: true })
   @Column({ type: DataType.FLOAT })
-  sensorValue: number;
+  sensorValue?: number;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   @Column({ type: DataType.DATE })
   createdAt: Date;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   @Column({ type: DataType.DATE })
   updatedAt: Date;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   @Column({ type: DataType.DATE })
   deletedAt: Date;
 
+  @Field(() => Area, { nullable: true })
   @BelongsTo(() => Area)
   area: Area;
 }

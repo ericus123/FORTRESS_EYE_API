@@ -2,11 +2,12 @@ import { UseGuards } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Roles } from "../auth/auth.decorators";
 import { AuthGuard } from "../auth/auth.guard";
+import { RoleName } from "../role/role.model";
 import { Permission } from "./permission.model";
 import { PermissionService } from "./permission.service";
 
 @UseGuards(AuthGuard)
-@Roles("SuperAdmin")
+@Roles(RoleName.SUPER_ADMIN)
 @Resolver("PermissionResolver")
 export class PermissionResolver {
   constructor(private readonly permissionService: PermissionService) {}

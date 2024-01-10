@@ -50,7 +50,7 @@ export class UserResolver {
   }
 
   @UseGuards(AuthGuard)
-  @Roles(RoleName.SUPER_ADMIN)
+  @Roles(RoleName.SUPER_ADMIN, RoleName.ADMIN)
   @Mutation(() => Boolean)
   async InviteUser(@Args("email") email: string): Promise<boolean> {
     return this.userService.sendInvitation({ email });

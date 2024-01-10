@@ -1,9 +1,10 @@
 import { Field, ID, InputType, ObjectType } from "@nestjs/graphql";
 import {
+  BelongsTo,
   Column,
   DataType,
   Default,
-  HasMany,
+  ForeignKey,
   Index,
   Model,
   PrimaryKey,
@@ -28,9 +29,10 @@ export class Image extends Model<Image> {
   @Column({ type: DataType.STRING })
   imageID?: string = uuidv4();
 
-  @Field(() => Number)
-  @Column({ type: DataType.INTEGER })
-  eventID: number;
+  @Field(() => String)
+  @ForeignKey(() => Event)
+  @Column({ type: DataType.STRING })
+  eventID: string;
 
   @Field(() => String)
   @Column({ type: DataType.STRING })
@@ -48,6 +50,7 @@ export class Image extends Model<Image> {
   @Column({ type: DataType.DATE })
   deletedAt: Date;
 
-  @HasMany(() => Event)
+  @Field(() => Event)
+  @BelongsTo(() => Event)
   event: Event;
 }

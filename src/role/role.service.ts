@@ -140,15 +140,15 @@ export class RoleService {
   }
 
   async getRoleByName(roleName: string): Promise<Role> {
-    try {
-      return await this.roleModel.findOne({
-        where: {
-          roleName,
-        },
-      });
-    } catch (error) {
-      throw new NotFoundException("Role not found");
-    }
+    // try {
+    return await this.roleModel.findOne({
+      where: {
+        roleName,
+      },
+    });
+    // } catch (error) {
+    //   throw new NotFoundException("Role not found");
+    // }
   }
 
   private async assignPermissions({

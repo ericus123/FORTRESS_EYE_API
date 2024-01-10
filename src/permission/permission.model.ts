@@ -69,11 +69,9 @@ export const rolePermissions = {
 
 @InputType()
 export class PermissionInput {
-  @Unique
   @Field(() => String)
   @Column({
     type: DataType.ENUM(...Object.values(PermissionName)),
-    unique: true,
   })
   permissionName: PermissionName;
 
@@ -96,11 +94,12 @@ export class Permission extends Model<Permission> {
   @Default(UUIDV4)
   @Column({ type: DataType.STRING })
   id?: string = uuidv4();
-  @Unique
+
+  // @Unique
   @Field(() => String)
   @Column({
     type: DataType.ENUM(...Object.values(PermissionName)),
-    unique: true,
+    // unique: true,
   })
   permissionName: PermissionName;
 

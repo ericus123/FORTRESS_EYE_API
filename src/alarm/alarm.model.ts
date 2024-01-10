@@ -3,63 +3,59 @@ import {
   BelongsTo,
   Column,
   DataType,
+  Default,
   ForeignKey,
   Index,
   Model,
   PrimaryKey,
   Table,
 } from "sequelize-typescript";
+import { v4 as uuidv4 } from "uuid";
 import { Area } from "../area/area.model";
 
-export enum ActuatorType {
-  LIGHT_CONTROL = "LIGHT_CONTROL",
-  BUZZER_CONTROL = "BUZZER_CONTROL",
-}
-
 @ObjectType()
-@InputType("IActuator")
+@InputType("IAlarm")
 @Table({
   timestamps: true,
-  tableName: "Actuator",
+  tableName: "Alarm",
   omitNull: true,
   paranoid: true,
 })
-export class Actuator extends Model<Actuator> {
+export class Alarm extends Model<Alarm> {
   @Field((type) => ID)
   @Index
   @PrimaryKey
-  @Column({ type: DataType.INTEGER, autoIncrement: true })
-  actuatorID: number;
-
-  @Field(() => String)
+  @Default(uuidv4)
   @Column({ type: DataType.STRING })
-  actuatorName: string;
+  id?: string = uuidv4();
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: DataType.STRING })
+  alarmName: string;
 
   @ForeignKey(() => Area)
-  @Field((type) => Number)
-  @Column({ type: DataType.INTEGER })
-  areaID: number;
-
-  @Field(() => String)
-  @Column({ type: DataType.ENUM(...Object.values(ActuatorType)) })
-  actuatorType: ActuatorType;
+  @Field(() => String, { nullable: true })
+  @Column({ type: DataType.STRING })
+  areaID: string;
 
   @Field(() => Boolean)
+  @Default(() => false)
   @Column({ type: DataType.BOOLEAN })
-  actuatorStatus: boolean;
+  isOn: boolean;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   @Column({ type: DataType.DATE })
   createdAt: Date;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   @Column({ type: DataType.DATE })
   updatedAt: Date;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   @Column({ type: DataType.DATE })
   deletedAt: Date;
 
+  @Field(() => Area, { nullable: true })
   @BelongsTo(() => Area)
   area: Area;
 }
