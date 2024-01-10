@@ -87,7 +87,7 @@ export class MailService {
             <body>
                 <p>Hi ${firstName},</p>
                 <p>Thanks for creating an account in FortressEye.</p>
-                <p>Click <a href="${process.env.FRONTEND_URL}/dashboard?verify=${token}">here</a> to verify your account</p>
+                <p>Click <a href="${process.env.FRONTEND_URL}/dashboard?verify=${token}" target="_blank">here</a> to verify your account</p>
             </body>
             </html>
         `;
@@ -109,7 +109,7 @@ export class MailService {
             <body>
                 <p>Hi ${firstName},</p>
                 <p>Sorry to hear that you forgot your password.</p>
-                <p>Click <a href="${process.env.FRONTEND_URL}/forgot-password?reset=${token}">here</a> to reset your password</p>
+                <p>Click <a href="${process.env.FRONTEND_URL}/forgot-password?reset=${token}" target="_blank">here</a> to reset your password</p>
             </body>
             </html>
         `;
@@ -130,7 +130,7 @@ export class MailService {
       <body>
           <p>Hello,</p>
           <p>You've been invited to join FortressEye.</p>
-          <p>Click <a href="${process.env.FRONTEND_URL}/invitation?token=${token}">here</a> to join the system</p>
+          <p>Click <a href="${process.env.FRONTEND_URL}/invitation?token=${token}" target="_blank">here</a> to join the system</p>
       </body>
       </html>
           `;

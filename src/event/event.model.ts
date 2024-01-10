@@ -32,9 +32,9 @@ export class Event extends Model<Event> {
   eventID?: string = uuidv4();
 
   @ForeignKey(() => Camera)
-  @Field((type) => Number)
-  @Column({ type: DataType.INTEGER })
-  cameraID: number;
+  @Field((type) => String)
+  @Column({ type: DataType.STRING })
+  cameraID: string;
 
   @Field()
   @Column({ type: DataType.STRING })
@@ -51,6 +51,7 @@ export class Event extends Model<Event> {
   @BelongsTo(() => Camera)
   camera: Camera;
 
+  @Field(() => [Image])
   @HasMany(() => Image)
   images: Image[];
 

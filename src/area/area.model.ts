@@ -5,12 +5,17 @@ import {
   Column,
   DataType,
   Default,
+  HasMany,
+  HasOne,
   Index,
   Model,
   PrimaryKey,
   Table,
 } from "sequelize-typescript";
 import { v4 as uuidv4 } from "uuid";
+import { Alarm } from "../alarm/alarm.model";
+import { Light } from "../light/light.model";
+import { Sensor } from "../sensor/sensor.model";
 
 @ObjectType()
 @InputType("IArea")
@@ -33,6 +38,18 @@ export class Area extends Model<Area> {
   @Length(1, 30, { message: "Area name must be between 1 and 30 characters" })
   @Column({ type: DataType.STRING })
   name: string;
+
+  @Field(() => Light, { nullable: true })
+  @HasOne(() => Light)
+  light: Light;
+
+  @Field(() => Alarm, { nullable: true })
+  @HasMany(() => Alarm)
+  alarm: Alarm;
+
+  @Field(() => Sensor, { nullable: true })
+  @HasMany(() => Sensor)
+  sensor: Sensor;
 
   @Field({ nullable: true })
   @Column({ type: DataType.DATE })

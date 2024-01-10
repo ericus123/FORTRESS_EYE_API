@@ -2,18 +2,18 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Area } from "../area/area.model";
 import { assignUUID } from "../helpers";
-import { Light } from "./light.model";
+import { Alarm } from "./alarm.model";
 
 @Injectable()
-export class LightService {
+export class AlarmService {
   constructor(
-    @InjectModel(Light)
-    private readonly lightModel: typeof Light,
+    @InjectModel(Alarm)
+    private readonly alarmModel: typeof Alarm,
   ) {}
 
-  async getLight(id: string): Promise<Light> {
+  async getAlarm(id: string): Promise<Alarm> {
     try {
-      const light = await this.lightModel.findByPk(id, {
+      const alarm = await this.alarmModel.findByPk(id, {
         include: [
           {
             model: Area,
@@ -22,35 +22,19 @@ export class LightService {
         ],
       });
 
-      if (!light) {
-        throw new NotFoundException("Light not found");
+      if (!alarm) {
+        throw new NotFoundException("Alarm not found");
       }
 
-      return light;
+      return alarm;
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async getLights(): Promise<Light[]> {
+  async getAlarms(): Promise<Alarm[]> {
     try {
-      const lights = await this.lightModel.findAll({
-        include: [
-          {
-            model: Area,
-            attributes: ["id", "name"],
-          },
-        ],
-      });
-      return lights;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
-  async addLight(input: Light): Promise<Light> {
-    try {
-      return await this.lightModel.create(assignUUID(input), {
+      return await this.alarmModel.findAll({
         include: [
           {
             model: Area,
@@ -63,22 +47,36 @@ export class LightService {
     }
   }
 
-  async deleteLight(id: string): Promise<boolean> {
+  async addAlarm(input: Alarm): Promise<Alarm> {
     try {
-      const light = await this.getLight(id);
-      await light.destroy();
+      return await this.alarmModel.create(assignUUID(input), {
+        include: [
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async deleteAlarm(id: string): Promise<boolean> {
+    try {
+      const alarm = await this.getAlarm(id);
+      await alarm.destroy();
       return true;
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async updateLight(id: string, input: Light): Promise<Light> {
+  async updateAlarm(id: string, input: Alarm): Promise<Alarm> {
     try {
-      const light = await this.getLight(id);
-      await light.update(input);
-
-      return light;
+      const alarm = await this.getAlarm(id);
+      await alarm.update(input);
+      return alarm;
     } catch (error) {
       throw new Error(error);
     }

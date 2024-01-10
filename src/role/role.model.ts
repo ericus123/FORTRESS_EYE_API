@@ -10,7 +10,6 @@ import {
   Model,
   PrimaryKey,
   Table,
-  Unique,
 } from "sequelize-typescript";
 import { v4 as uuidv4 } from "uuid";
 import { Permission, PermissionRole } from "../permission/permission.model";
@@ -41,10 +40,14 @@ export class AssignRoleInput {
 
 @InputType()
 export class RoleInput {
-  @Unique
+  // @Unique
   @Field(() => String)
   @IsEnum(RoleName, { message: "Invalid role name" })
-  @Column({ type: DataType.ENUM(...Object.values(RoleName)), unique: true })
+  @Column({
+    type: DataType.ENUM(...Object.values(RoleName)),
+
+    // unique: true
+  })
   roleName?: RoleName;
 
   @Field(() => String, { nullable: true })
@@ -73,9 +76,12 @@ export class Role extends Model<Role> {
   @Column({ type: DataType.STRING })
   id?: string = uuidv4();
 
-  @Unique
+  // @Unique
   @Field(() => String)
-  @Column({ type: DataType.ENUM(...Object.values(RoleName)), unique: true })
+  @Column({
+    type: DataType.ENUM(...Object.values(RoleName)),
+    // unique: true
+  })
   roleName: RoleName;
 
   @Field(() => String, { nullable: true })

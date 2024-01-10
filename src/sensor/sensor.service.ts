@@ -2,18 +2,18 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Area } from "../area/area.model";
 import { assignUUID } from "../helpers";
-import { Light } from "./light.model";
+import { Sensor } from "./sensor.model";
 
 @Injectable()
-export class LightService {
+export class SensorService {
   constructor(
-    @InjectModel(Light)
-    private readonly lightModel: typeof Light,
+    @InjectModel(Sensor)
+    private readonly sensorModel: typeof Sensor,
   ) {}
 
-  async getLight(id: string): Promise<Light> {
+  async getSensor(id: string): Promise<Sensor> {
     try {
-      const light = await this.lightModel.findByPk(id, {
+      const sensor = await this.sensorModel.findByPk(id, {
         include: [
           {
             model: Area,
@@ -22,35 +22,19 @@ export class LightService {
         ],
       });
 
-      if (!light) {
-        throw new NotFoundException("Light not found");
+      if (!sensor) {
+        throw new NotFoundException("Sensor not found");
       }
 
-      return light;
+      return sensor;
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async getLights(): Promise<Light[]> {
+  async getSensors(): Promise<Sensor[]> {
     try {
-      const lights = await this.lightModel.findAll({
-        include: [
-          {
-            model: Area,
-            attributes: ["id", "name"],
-          },
-        ],
-      });
-      return lights;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
-  async addLight(input: Light): Promise<Light> {
-    try {
-      return await this.lightModel.create(assignUUID(input), {
+      return await this.sensorModel.findAll({
         include: [
           {
             model: Area,
@@ -63,22 +47,36 @@ export class LightService {
     }
   }
 
-  async deleteLight(id: string): Promise<boolean> {
+  async addSensor(input: Sensor): Promise<Sensor> {
     try {
-      const light = await this.getLight(id);
-      await light.destroy();
+      return await this.sensorModel.create(assignUUID(input), {
+        include: [
+          {
+            model: Area,
+            attributes: ["id", "name"],
+          },
+        ],
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async deleteSensor(id: string): Promise<boolean> {
+    try {
+      const sensor = await this.getSensor(id);
+      await sensor.destroy();
       return true;
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async updateLight(id: string, input: Light): Promise<Light> {
+  async updateSensor(id: string, input: Sensor): Promise<Sensor> {
     try {
-      const light = await this.getLight(id);
-      await light.update(input);
-
-      return light;
+      const sensor = await this.getSensor(id);
+      await sensor.update(input);
+      return sensor;
     } catch (error) {
       throw new Error(error);
     }
