@@ -13,21 +13,15 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { Area } from "../area/area.model";
 
-export enum SensorType {
-  TEMPERATURE = "TEMPERATURE",
-  HUMIDITY = "HUMIDITY",
-  MOTION = "MOTION",
-}
-
 @ObjectType()
-@InputType("ISensor")
+@InputType("IFan")
 @Table({
   timestamps: true,
-  tableName: "Sensor",
+  tableName: "Fan",
   omitNull: true,
   paranoid: true,
 })
-export class Sensor extends Model<Sensor> {
+export class Fan extends Model<Fan> {
   @Field((type) => ID)
   @Index
   @PrimaryKey
@@ -35,22 +29,19 @@ export class Sensor extends Model<Sensor> {
   @Column({ type: DataType.STRING })
   id?: string = uuidv4();
 
+  @Field(() => String)
+  @Column({ type: DataType.STRING })
+  name?: string;
+
   @ForeignKey(() => Area)
   @Field(() => String, { nullable: true })
   @Column({ type: DataType.STRING })
   areaID: string;
 
-  @Field(() => String)
-  @Column({ type: DataType.STRING })
-  name: string;
-
-  @Field(() => String, { nullable: true })
-  @Column({ type: DataType.ENUM(...Object.values(SensorType)) })
-  type: SensorType;
-
-  @Field(() => Number, { nullable: true })
-  @Column({ type: DataType.FLOAT })
-  value?: number;
+  @Field(() => Boolean)
+  @Default(() => false)
+  @Column({ type: DataType.BOOLEAN })
+  isOn: boolean;
 
   @Field(() => Date, { nullable: true })
   @Column({ type: DataType.DATE })

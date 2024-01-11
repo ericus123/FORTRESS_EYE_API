@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Alarm } from "../alarm/alarm.model";
+import { Fan } from "../fan/fan.model";
 import { Light } from "../light/light.model";
 import { Sensor } from "../sensor/sensor.model";
 import { Area } from "./area.model";
@@ -30,12 +31,16 @@ export class AreaService {
             attributes: ["id", "isOn", "areaID", "createdAt"],
           },
           {
-            model: Sensor,
             attributes: ["id", "name", "type", "value", "areaID", "createdAt"],
+            model: Sensor,
           },
           {
+            // attributes: ["id", "name", "isOn", "areaID", "createdAt"],
             model: Alarm,
+          },
+          {
             attributes: ["id", "name", "isOn", "areaID", "createdAt"],
+            model: Fan,
           },
         ],
       });
@@ -45,7 +50,26 @@ export class AreaService {
   }
   async getArea(id: string): Promise<Area> {
     try {
-      const area = await this.areaModel.findByPk(id);
+      const area = await this.areaModel.findByPk(id, {
+        include: [
+          {
+            model: Light,
+            attributes: ["id", "isOn", "areaID", "createdAt"],
+          },
+          {
+            model: Sensor,
+            attributes: ["id", "name", "type", "value", "areaID", "createdAt"],
+          },
+          {
+            model: Alarm,
+            attributes: ["id", "name", "isOn", "areaID", "createdAt"],
+          },
+          {
+            model: Fan,
+            attributes: ["id", "name", "isOn", "areaID", "createdAt"],
+          },
+        ],
+      });
       if (!area) {
         throw new NotFoundException("Area not found");
       }
