@@ -10,6 +10,7 @@ import { Camera } from "../camera/camera.model";
 import { databaseConfigs } from "../config/database.config";
 import { CryptoModule } from "../crypto/crypto.module";
 import { Event } from "../event/event.model";
+import { Fan } from "../fan/fan.model";
 import { Image } from "../image/image.model";
 import { JwtModule } from "../jwt/jwt.module";
 import { Light } from "../light/light.model";
@@ -53,6 +54,7 @@ import { UserService } from "../user/user.service";
           Event,
           Camera,
           Sensor,
+          Fan,
         ],
         autoLoadModels: true,
         synchronize: process.env.ALTER_TABLES == "true" ? true : false,
@@ -75,6 +77,7 @@ import { UserService } from "../user/user.service";
       Event,
       Camera,
       Sensor,
+      Fan,
     ]),
     JwtModule,
   ],

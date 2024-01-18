@@ -14,6 +14,7 @@ import {
 } from "sequelize-typescript";
 import { v4 as uuidv4 } from "uuid";
 import { Alarm } from "../alarm/alarm.model";
+import { Fan } from "../fan/fan.model";
 import { Light } from "../light/light.model";
 import { Sensor } from "../sensor/sensor.model";
 
@@ -43,13 +44,17 @@ export class Area extends Model<Area> {
   @HasOne(() => Light)
   light: Light;
 
-  @Field(() => Alarm, { nullable: true })
+  @Field(() => [Alarm], { nullable: true })
   @HasMany(() => Alarm)
-  alarm: Alarm;
+  alarms?: Alarm[];
 
-  @Field(() => Sensor, { nullable: true })
+  @Field(() => [Sensor], { nullable: true })
   @HasMany(() => Sensor)
-  sensor: Sensor;
+  sensors?: Sensor[];
+
+  @Field(() => [Fan], { nullable: true })
+  @HasMany(() => Fan)
+  fans?: Fan[];
 
   @Field({ nullable: true })
   @Column({ type: DataType.DATE })

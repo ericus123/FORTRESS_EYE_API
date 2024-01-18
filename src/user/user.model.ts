@@ -57,7 +57,7 @@ export class User extends Model<User> {
 
   @Field({ nullable: true })
   @Unique
-  @Length(1, 255, { message: "Username must be between 1 and 255 characters" })
+  @Length(1, 20, { message: "Username must be between 1 and 20 characters" })
   @Column({ type: DataType.STRING })
   username: string;
 

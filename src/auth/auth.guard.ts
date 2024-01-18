@@ -96,7 +96,6 @@ export class AuthGuard implements CanActivate {
       res.setHeader("x-refresh-token", null);
       throw new UnauthorizedException(AuthErrors.SESSION_EXIRED);
     }
-
     request.userEmail = payload.data.email;
     request.token = accessToken;
     return true;

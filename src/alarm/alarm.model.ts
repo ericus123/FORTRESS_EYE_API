@@ -29,7 +29,7 @@ export class Alarm extends Model<Alarm> {
   @Column({ type: DataType.STRING })
   id?: string = uuidv4();
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   @Column({ type: DataType.STRING })
   name: string;
 

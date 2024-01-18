@@ -7,6 +7,8 @@ import { AreaModule } from "../area/area.module";
 import { AreaResolver } from "../area/area.resolver";
 import { AuthModule } from "../auth/auth.module";
 import { AuthResolver } from "../auth/auth.resolver";
+import { FanModule } from "../fan/fan.module";
+import { FanResolver } from "../fan/fan.resolver";
 import { JwtModule } from "../jwt/jwt.module";
 import { LightModule } from "../light/light.module";
 import { LightResolver } from "../light/light.resolver";
@@ -30,6 +32,7 @@ import { UserResolver } from "../user/user.resolver";
     SensorModule,
     RoleModule,
     PermissionModule,
+    FanModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: "src/graphql/schema.gql",
@@ -45,6 +48,7 @@ import { UserResolver } from "../user/user.resolver";
     PermissionResolver,
     LightResolver,
     AlarmResolver,
+    FanResolver,
   ],
 })
 export class GraphqlModule {}
