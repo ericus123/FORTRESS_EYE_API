@@ -14,6 +14,7 @@ import {
 } from "sequelize-typescript";
 import { v4 as uuidv4 } from "uuid";
 import { Alarm } from "../alarm/alarm.model";
+import { Door } from "../door/door.model";
 import { Fan } from "../fan/fan.model";
 import { Light } from "../light/light.model";
 import { Sensor } from "../sensor/sensor.model";
@@ -43,6 +44,10 @@ export class Area extends Model<Area> {
   @Field(() => Light, { nullable: true })
   @HasOne(() => Light)
   light: Light;
+
+  @Field(() => Door, { nullable: true })
+  @HasOne(() => Door)
+  door: Door;
 
   @Field(() => [Alarm], { nullable: true })
   @HasMany(() => Alarm)

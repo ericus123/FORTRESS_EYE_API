@@ -7,6 +7,8 @@ import { AreaModule } from "../area/area.module";
 import { AreaResolver } from "../area/area.resolver";
 import { AuthModule } from "../auth/auth.module";
 import { AuthResolver } from "../auth/auth.resolver";
+import { DoorModule } from "../door/door.module";
+import { DoorResolver } from "../door/door.resolver";
 import { FanModule } from "../fan/fan.module";
 import { FanResolver } from "../fan/fan.resolver";
 import { JwtModule } from "../jwt/jwt.module";
@@ -31,6 +33,7 @@ import { UserResolver } from "../user/user.resolver";
     JwtModule,
     SensorModule,
     RoleModule,
+    DoorModule,
     PermissionModule,
     FanModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -49,6 +52,7 @@ import { UserResolver } from "../user/user.resolver";
     LightResolver,
     AlarmResolver,
     FanResolver,
+    DoorResolver,
   ],
 })
 export class GraphqlModule {}
