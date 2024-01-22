@@ -1,12 +1,11 @@
-import { Injectable, UseGuards } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Args, Mutation, Query } from "@nestjs/graphql";
 import { Roles } from "../auth/auth.decorators";
-import { AuthGuard } from "../auth/auth.guard";
 import { RoleName } from "../role/role.model";
 import { Light } from "./light.model";
 import { LightService } from "./light.service";
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Injectable()
 export class LightResolver {
   constructor(private readonly lightService: LightService) {}
@@ -20,7 +19,7 @@ export class LightResolver {
     return this.lightService.getLights();
   }
 
-  @Roles(RoleName.SUPER_ADMIN, RoleName.ADMIN)
+  // @Roles(RoleName.SUPER_ADMIN, RoleName.ADMIN)
   @Mutation(() => Light)
   async addLight(@Args("input") input: Light): Promise<Light> {
     return this.lightService.addLight(input);

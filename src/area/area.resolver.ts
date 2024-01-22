@@ -1,13 +1,11 @@
-import { UseGuards } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Roles } from "../auth/auth.decorators";
-import { AuthGuard } from "../auth/auth.guard";
 import { RoleName } from "../role/role.model";
 import { Area } from "./area.model";
 import { AreaService } from "./area.service";
 import { AreaInput } from "./area.types";
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Resolver("AreaResolver")
 export class AreaResolver {
   constructor(private readonly areaService: AreaService) {}

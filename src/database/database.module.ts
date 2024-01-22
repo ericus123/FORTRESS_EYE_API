@@ -9,6 +9,7 @@ import { CacheModule } from "../cache/cache.module";
 import { Camera } from "../camera/camera.model";
 import { databaseConfigs } from "../config/database.config";
 import { CryptoModule } from "../crypto/crypto.module";
+import { Door } from "../door/door.model";
 import { Event } from "../event/event.model";
 import { Fan } from "../fan/fan.model";
 import { Image } from "../image/image.model";
@@ -55,6 +56,7 @@ import { UserService } from "../user/user.service";
           Camera,
           Sensor,
           Fan,
+          Door,
         ],
         autoLoadModels: true,
         synchronize: process.env.ALTER_TABLES == "true" ? true : false,
@@ -78,6 +80,7 @@ import { UserService } from "../user/user.service";
       Camera,
       Sensor,
       Fan,
+      Door,
     ]),
     JwtModule,
   ],
