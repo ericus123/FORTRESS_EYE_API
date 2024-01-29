@@ -13,6 +13,7 @@ import { GraphqlModule } from "./graphql/graphql.module";
 import { JwtModule } from "./jwt/jwt.module";
 import { LightModule } from "./light/light.module";
 import { MailModule } from "./mail/mail.module";
+import { MediaModule } from "./media/media.module";
 import { MqttModule } from "./mqtt/mqtt.module";
 import { SensorModule } from "./sensor/sensor.module";
 import { UserModule } from "./user/user.module";
@@ -51,6 +52,7 @@ import { UserModule } from "./user/user.module";
     LightModule,
     AlarmModule,
     SensorModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

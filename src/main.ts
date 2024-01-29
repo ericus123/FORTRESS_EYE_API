@@ -4,6 +4,7 @@ import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { altairExpress } from "altair-express-middleware";
+import * as csurf from "csurf";
 import { AppModule } from "./app.module";
 
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
@@ -31,6 +32,7 @@ async function bootstrap() {
     },
   });
   app.enableCors();
+  app.use(csurf({}));
   await app.startAllMicroservices();
   await app.listen(process.env.PORT, "0.0.0.0");
   logger.debug(`Server is running at ${await app.getUrl()}`);
