@@ -21,6 +21,7 @@ import {
   AuthResponse,
   CompleteProfileInput,
   GetUserInput,
+  ProfileInput,
   SignupInput,
   TokenType,
 } from "./user.types";
@@ -177,6 +178,28 @@ export class UserService {
 
       if (user.isComplete) {
         throw new BadRequestException("Your profile is already complete");
+      }
+
+      return await user.update(input);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async updateProfile({
+    input,
+    email,
+  }: {
+    input: ProfileInput;
+    email: string;
+  }): Promise<User> {
+    try {
+      const user = await this.getUser({
+        type: "EMAIL",
+        value: email,
+      });
+      if (!user) {
+        throw new Error("Unknown user");
       }
 
       return await user.update(input);
@@ -435,6 +458,30 @@ export class UserService {
       }
 
       return _token?.data?.email;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async getProfile(email: string): Promise<User> {
+    try {
+      const user = await this.userModel.findOne({
+        where: { email },
+
+        include: [
+          {
+            model: Role,
+            attributes: ["roleName", "description"],
+            include: [
+              {
+                model: Permission,
+                attributes: ["permissionName", "description"],
+              },
+            ],
+          },
+        ],
+      });
+      return user;
     } catch (error) {
       throw new Error(error);
     }

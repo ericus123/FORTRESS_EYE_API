@@ -1,12 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 import { Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { altairExpress } from "altair-express-middleware";
 import { AppModule } from "./app.module";
 
-import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -19,17 +17,14 @@ async function bootstrap() {
   expressApp.use("/altair", altairExpress({ endpointURL: "/graphql" }));
 
   logger.log("Starting all microservices");
-  const config = app.get(ConfigService);
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.MQTT,
-    options: {
-      url: `mqtt://${config.get<string>("MQTT_IP")}:${config.get<string>(
-        "MQTT_PORT",
-      )}`,
-      username: config.get<string>("MQTT_USER"),
-      password: config.get<string>("MQTT_PASS"),
-    },
-  });
+  // app.connectMicroservice<MicroserviceOptions>({
+  //   transport: Transport.MQTT,
+  //   options: {
+  //     url: `mqtt://${process.env.MQTT_IP}:${process.env.MQTT_PORT}`,
+  //     username: process.env.MQTT_USER,
+  //     password: process.env.MQTT_PASS,
+  //   },
+  // });
   app.enableCors();
   await app.startAllMicroservices();
   await app.listen(process.env.PORT, "0.0.0.0");
