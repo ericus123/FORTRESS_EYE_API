@@ -57,12 +57,12 @@ export class User extends Model<User> {
 
   @Field({ nullable: true })
   @Unique
-  @Length(1, 20, { message: "Username must be between 1 and 20 characters" })
+  @Length(3, 10, { message: "Username must be between 1 and 20 characters" })
   @Column({ type: DataType.STRING })
   username: string;
 
   @Field({ nullable: true })
-  @Length(1, 255, { message: "Bio must be between 1 and 255 characters" })
+  @Length(10, 255, { message: "Bio must be between 1 and 255 characters" })
   @Column({ type: DataType.STRING })
   bio: string;
 
@@ -70,7 +70,7 @@ export class User extends Model<User> {
   @Column({ type: DataType.STRING })
   password: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Unique
   @IsEmail({}, { message: "Invalid email address" })
   @Column({ type: DataType.STRING })

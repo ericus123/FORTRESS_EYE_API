@@ -8,6 +8,7 @@ export const jwtConstants = () => {
 };
 
 export enum AuthErrors {
+  USERNAME_TAKEN = "USERNAME_TAKEN",
   INVALID_TOKEN = "INVALID_TOKEN",
   SAME_PASSWORD = "SAME_PASSWORD",
   INVALID_HEADERS = "INVALID_HEADERS",

@@ -64,6 +64,12 @@ export class SignupInput {
   @Column({ type: DataType.STRING })
   email: string;
 
+  @Field({ nullable: true })
+  @Unique
+  @Length(3, 10, { message: "Username must be between 1 and 10 characters" })
+  @Column({ type: DataType.STRING })
+  username: string;
+
   @Field({ nullable: false })
   @MinLength(6)
   @IsStrongPassword()
@@ -89,9 +95,42 @@ export class CompleteProfileInput {
 
   @Field({ nullable: true })
   @Unique
-  @Length(1, 255, { message: "Username must be between 1 and 255 characters" })
+  @Length(3, 10, { message: "Username must be between 1 and 10 characters" })
   @Column({ type: DataType.STRING })
   username: string;
+
+  @Field({ nullable: true })
+  @Length(1, 255, { message: "Bio must be between 1 and 255 characters" })
+  @Column({ type: DataType.STRING })
+  bio: string;
+}
+
+@InputType()
+@ObjectType()
+export class ProfileInput {
+  @Field({ nullable: true })
+  @MinLength(2)
+  @MaxLength(16)
+  @Column({ type: DataType.STRING })
+  firstName: string;
+
+  @Field({ nullable: true })
+  @MinLength(2)
+  @MaxLength(16)
+  @Column({ type: DataType.STRING })
+  lastName: string;
+  @Field({ nullable: true })
+  @IsUrl({}, { message: "Invalid URL format for avatar" })
+  @Column({ type: DataType.STRING })
+  avatar: string;
+
+  @Field({ nullable: true })
+  @IsPhoneNumber(null, { message: "Invalid phone number" })
+  @Length(1, 15, {
+    message: "Phone number must be between 1 and 15 characters",
+  })
+  @Column({ type: DataType.STRING })
+  phoneNumber: string;
 
   @Field({ nullable: true })
   @Length(1, 255, { message: "Bio must be between 1 and 255 characters" })

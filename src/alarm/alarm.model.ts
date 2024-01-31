@@ -9,6 +9,7 @@ import {
   Model,
   PrimaryKey,
   Table,
+  Unique,
 } from "sequelize-typescript";
 import { v4 as uuidv4 } from "uuid";
 import { Area } from "../area/area.model";
@@ -29,6 +30,7 @@ export class Alarm extends Model<Alarm> {
   @Column({ type: DataType.STRING })
   id?: string = uuidv4();
 
+  @Unique
   @Field(() => String)
   @Column({ type: DataType.STRING })
   name: string;

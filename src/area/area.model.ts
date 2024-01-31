@@ -11,6 +11,7 @@ import {
   Model,
   PrimaryKey,
   Table,
+  Unique,
 } from "sequelize-typescript";
 import { v4 as uuidv4 } from "uuid";
 import { Alarm } from "../alarm/alarm.model";
@@ -36,6 +37,7 @@ export class Area extends Model<Area> {
   id?: string = uuidv4();
 
   @Field(() => String)
+  @Unique
   @IsNotEmpty({ message: "Area name is required" })
   @Length(1, 30, { message: "Area name must be between 1 and 30 characters" })
   @Column({ type: DataType.STRING })

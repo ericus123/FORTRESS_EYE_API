@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { CacheService } from "../cache/cache.service";
 import HashingService from "../crypto/hashing.service";
@@ -68,6 +72,16 @@ export class AuthService {
       type: "EMAIL",
       value: email,
     });
+
+    const userNameExist = await this.userModel.findOne({
+      where: {
+        username: input.username,
+      },
+    });
+
+    if (userNameExist) {
+      throw new BadRequestException(AuthErrors.USERNAME_TAKEN);
+    }
 
     if (exist) {
       throw new UnauthorizedException(AuthErrors.ALREADY_REGISTERED);
